@@ -1,0 +1,85 @@
+const axios = require('axios');
+
+// Fallback locality scores for Pune areas (based on transit connectivity)
+const TRANSPORT_LOCALITY_SCORES = {
+  'koregaon park': 70, 'baner': 65, 'aundh': 75, 'kothrud': 72,
+  'wakad': 55, 'hinjewadi': 45, 'viman nagar': 68, 'hadapsar': 62,
+  'kharadi': 58, 'pimple saudagar': 60, 'magarpatta': 65,
+  'kalyani nagar': 70, 'pune': 65, 'pimpri': 70, 'chinchwad': 68,
+};
+
+/**
+ * Match locality name against fallback map.
+ */
+function getFallbackScore(lat, lng, localityName) {
+  const search = (localityName || '').toLowerCase();
+  let matched = null;
+
+  for (const [key, score] of Object.entries(TRANSPORT_LOCALITY_SCORES)) {
+    if (search.includes(key)) {
+      matched = key;
+      const s = Math.min(100, Math.max(0, score));
+      return {
+        score: s,
+        raw: { count: Math.floor(s / 15), source: 'fallback', locality_matched: matched },
+      };
+    }
+  }
+
+  // Deterministic score from coordinates for unknown localities
+  const deterministicScore = Math.floor(55 + (Math.abs(lat * lng) % 30));
+  const s = Math.min(100, Math.max(0, deterministicScore));
+  return {
+    score: s,
+    raw: { count: Math.floor(s / 15), source: 'fallback', locality_matched: null },
+  };
+}
+
+/**
+ * Count bus stations within 500m using Google Maps Places Nearby Search.
+ * Falls back to locality-based scoring if API is unavailable.
+ */
+async function getTransportScore(lat, lng, localityName) {
+  try {
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    if (!apiKey) {
+      return getFallbackScore(lat, lng, localityName);
+    }
+
+    const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+    const { data } = await axios.get(url, {
+      params: {
+        location: `${lat},${lng}`,
+        radius: 500,
+        type: 'bus_station',
+        key: apiKey,
+      },
+      timeout: 10000,
+    });
+
+    // If API returns non-OK status (billing issue, quota, etc.), use fallback
+    if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+      return getFallbackScore(lat, lng, localityName);
+    }
+
+    const results = data.results || [];
+    const count = results.length;
+    const score = Math.min(100, Math.max(0, count * 15));
+
+    return {
+      score,
+      raw: {
+        count,
+        source: 'google_places',
+        stops: results.slice(0, 5).map((r) => ({
+          name: r.name,
+          vicinity: r.vicinity || '',
+        })),
+      },
+    };
+  } catch (err) {
+    return getFallbackScore(lat, lng, localityName);
+  }
+}
+
+module.exports = { getTransportScore };
