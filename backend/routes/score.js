@@ -25,13 +25,48 @@ const FALLBACK_SCORES = {
 };
 
 /**
+ * Return weight map for a given profile.
+ * All weights in each profile sum to 1.0.
+ */
+function getWeights(profile) {
+  const profiles = {
+    general: {
+      air_quality: 0.15, school_quality: 0.20, flood_risk: 0.15,
+      healthcare: 0.15, crime_safety: 0.15, transport: 0.10,
+      property_value: 0.05, greenery: 0.05,
+    },
+    family: {
+      air_quality: 0.15, school_quality: 0.35, flood_risk: 0.10,
+      healthcare: 0.10, crime_safety: 0.20, transport: 0.05,
+      property_value: 0.02, greenery: 0.03,
+    },
+    professional: {
+      air_quality: 0.15, school_quality: 0.10, flood_risk: 0.03,
+      healthcare: 0.15, crime_safety: 0.15, transport: 0.25,
+      property_value: 0.15, greenery: 0.02,
+    },
+    retiree: {
+      air_quality: 0.15, school_quality: 0.03, flood_risk: 0.10,
+      healthcare: 0.30, crime_safety: 0.20, transport: 0.05,
+      property_value: 0.02, greenery: 0.15,
+    },
+    investor: {
+      air_quality: 0.05, school_quality: 0.15, flood_risk: 0.03,
+      healthcare: 0.10, crime_safety: 0.10, transport: 0.20,
+      property_value: 0.35, greenery: 0.02,
+    },
+  };
+  return profiles[profile] || profiles.general;
+}
+
+/**
  * Run the full scoring pipeline for a given lat/lng.
  */
-async function runScoringPipeline(lat, lng, locality_name) {
+async function runScoringPipeline(lat, lng, locality_name, profile = 'general') {
   // Call all 8 services in parallel — allSettled so one failure doesn't crash others
   const results = await Promise.allSettled([
-    getAqiScore(lat, lng),
-    getSchoolScore(lat, lng),
+    getAqiScore(lat, lng, locality_name),
+    getSchoolScore(lat, lng, locality_name),
     getFloodScore(lat, lng),
     getHealthcareScore(lat, lng, locality_name),
     getCrimeScore(lat, lng),
@@ -44,50 +79,43 @@ async function runScoringPipeline(lat, lng, locality_name) {
     'air_quality', 'school_quality', 'flood_risk', 'healthcare',
     'crime_safety', 'transport', 'greenery', 'property_value',
   ];
-  const weights = {
-    air_quality: '15%',
-    school_quality: '20%',
-    flood_risk: '15%',
-    healthcare: '15%',
-    crime_safety: '15%',
-    transport: '10%',
-    property_value: '5%',
-    greenery: '5%',
-  };
+
+  const weights = getWeights(profile);
 
   // Build dimensions from results, using fallbacks for rejected promises
   const dimensions = {};
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
+    const weightPct = `${Math.round(weights[key] * 100)}%`;
     if (results[i].status === 'fulfilled') {
       dimensions[key] = {
         score: Math.min(100, Math.max(0, results[i].value.score)),
-        weight: weights[key],
+        weight: weightPct,
         raw: results[i].value.raw,
       };
     } else {
       dimensions[key] = {
         score: FALLBACK_SCORES[key],
-        weight: weights[key],
+        weight: weightPct,
         raw: { error: true, message: results[i].reason?.message || 'Service failed' },
       };
     }
   }
 
-  // Calculate composite score
+  // Calculate composite score using profile weights
   const composite = Math.round(
-    dimensions.air_quality.score * 0.15 +
-    dimensions.school_quality.score * 0.20 +
-    dimensions.flood_risk.score * 0.15 +
-    dimensions.healthcare.score * 0.15 +
-    dimensions.crime_safety.score * 0.15 +
-    dimensions.transport.score * 0.10 +
-    dimensions.property_value.score * 0.05 +
-    dimensions.greenery.score * 0.05
+    dimensions.air_quality.score    * weights.air_quality +
+    dimensions.school_quality.score * weights.school_quality +
+    dimensions.flood_risk.score     * weights.flood_risk +
+    dimensions.healthcare.score     * weights.healthcare +
+    dimensions.crime_safety.score   * weights.crime_safety +
+    dimensions.transport.score      * weights.transport +
+    dimensions.property_value.score * weights.property_value +
+    dimensions.greenery.score       * weights.greenery
   );
 
-  // Generate AI narratives
-  const narratives = await generateNarratives(dimensions, locality_name);
+  // Generate AI narratives (profile-aware)
+  const narratives = await generateNarratives(dimensions, locality_name, profile);
 
   // Attach narratives to dimensions
   for (const key of Object.keys(dimensions)) {
@@ -99,14 +127,17 @@ async function runScoringPipeline(lat, lng, locality_name) {
   const response = {
     locality: locality_name,
     composite: Math.min(100, Math.max(0, composite)),
+    profile,
+    weights_used: weights,
     cached: false,
     timestamp,
     dimensions,
   };
 
-  // Cache to Firestore
+  // Cache to Firestore (include profile in cache key so different profiles don't clash)
   try {
-    const cacheId = locality_name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+    const baseId = locality_name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+    const cacheId = profile === 'general' ? baseId : `${baseId}_${profile}`;
     await db.collection('score_cache').doc(cacheId).set({
       ...response,
       cached_at: timestamp,
@@ -123,7 +154,7 @@ async function runScoringPipeline(lat, lng, locality_name) {
  */
 router.post('/', async (req, res) => {
   try {
-    const { lat, lng, locality_name } = req.body;
+    const { lat, lng, locality_name, profile } = req.body;
 
     if (lat == null || lng == null) {
       return res.status(400).json({ error: 'lat and lng are required' });
@@ -137,7 +168,7 @@ router.post('/', async (req, res) => {
     }
 
     const name = locality_name || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-    const response = await runScoringPipeline(latitude, longitude, name);
+    const response = await runScoringPipeline(latitude, longitude, name, profile || 'general');
     res.json(response);
   } catch (err) {
     console.error('Score endpoint error:', err);

@@ -2,10 +2,11 @@ const axios = require('axios');
 
 // Fallback locality scores for Pune areas (based on hospital density data)
 const HEALTHCARE_LOCALITY_SCORES = {
-  'koregaon park': 85, 'baner': 75, 'aundh': 80, 'kothrud': 78,
-  'wakad': 65, 'hinjewadi': 60, 'viman nagar': 82, 'hadapsar': 70,
-  'kharadi': 72, 'pimple saudagar': 68, 'magarpatta': 75,
-  'kalyani nagar': 83, 'pune': 70, 'pimpri': 65, 'chinchwad': 63,
+  'koregaon park': 92, 'baner': 78, 'aundh': 85, 'kothrud': 80,
+  'wakad': 65, 'hinjewadi': 58, 'viman nagar': 82, 'hadapsar': 68,
+  'kharadi': 70, 'pimple saudagar': 65, 'magarpatta': 72,
+  'kalyani nagar': 88, 'dhanori': 45, 'pune': 70, 'pimpri': 62,
+  'chinchwad': 60, 'nibm': 55, 'kondhwa': 52, 'katraj': 50, 'warje': 58,
 };
 
 /**

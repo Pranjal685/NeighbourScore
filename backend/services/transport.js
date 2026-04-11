@@ -2,10 +2,11 @@ const axios = require('axios');
 
 // Fallback locality scores for Pune areas (based on transit connectivity)
 const TRANSPORT_LOCALITY_SCORES = {
-  'koregaon park': 70, 'baner': 65, 'aundh': 75, 'kothrud': 72,
-  'wakad': 55, 'hinjewadi': 45, 'viman nagar': 68, 'hadapsar': 62,
-  'kharadi': 58, 'pimple saudagar': 60, 'magarpatta': 65,
-  'kalyani nagar': 70, 'pune': 65, 'pimpri': 70, 'chinchwad': 68,
+  'koregaon park': 88, 'baner': 68, 'aundh': 78, 'kothrud': 75,
+  'wakad': 52, 'hinjewadi': 42, 'viman nagar': 72, 'hadapsar': 65,
+  'kharadi': 60, 'pimple saudagar': 58, 'magarpatta': 68,
+  'kalyani nagar': 82, 'dhanori': 38, 'pune': 72, 'pimpri': 68,
+  'chinchwad': 65, 'nibm': 48, 'kondhwa': 45, 'katraj': 42, 'warje': 55,
 };
 
 /**
@@ -57,13 +58,18 @@ async function getTransportScore(lat, lng, localityName) {
       timeout: 10000,
     });
 
-    // If API returns non-OK status (billing issue, quota, etc.), use fallback
-    if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+    // If API returns non-OK or ZERO_RESULTS, use locality fallback
+    // ZERO_RESULTS for bus_station is unreliable — Places API often misses PMPML stops
+    if (data.status !== 'OK') {
       return getFallbackScore(lat, lng, localityName);
     }
 
     const results = data.results || [];
     const count = results.length;
+    // If API returns suspiciously low count (≤1), blend with fallback
+    if (count <= 1) {
+      return getFallbackScore(lat, lng, localityName);
+    }
     const score = Math.min(100, Math.max(0, count * 15));
 
     return {

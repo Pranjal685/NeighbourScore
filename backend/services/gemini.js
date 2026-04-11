@@ -5,32 +5,42 @@ const DIMENSION_KEYS = [
   'crime_safety', 'transport', 'property_value', 'greenery',
 ];
 
+const PROFILE_LABELS = {
+  family:       'a family with young children',
+  professional: 'a working professional',
+  retiree:      'a retiree or senior',
+  investor:     'a property investor',
+  general:      'a homebuyer',
+};
+
 /**
- * Generate fallback narrative based on score band.
+ * Generate fallback narrative based on score band and profile.
  */
-function fallbackNarrative(dimensionKey, score, localityName) {
+function fallbackNarrative(dimensionKey, score, localityName, profile = 'general') {
+  const profileLabel = PROFILE_LABELS[profile] || PROFILE_LABELS.general;
   if (score >= 80) {
-    return `This dimension scores excellently for ${localityName}. It is well above average for Pune.`;
+    return `This dimension scores excellently for ${localityName} — well above the Pune average. For ${profileLabel}, this is a strong positive signal.`;
   }
   if (score >= 60) {
-    return `This dimension scores moderately for ${localityName}. It is around the Pune average.`;
+    return `This dimension scores moderately for ${localityName}, around the Pune average. ${profileLabel.charAt(0).toUpperCase() + profileLabel.slice(1)} should weigh this carefully.`;
   }
-  return `This dimension scores below average for ${localityName}. Consider this carefully before deciding.`;
+  return `This dimension scores below average for ${localityName}. For ${profileLabel}, this is worth investigating before committing.`;
 }
 
 /**
  * Call Gemini to generate 2-sentence narratives for all 8 dimensions.
  * Falls back gracefully on any error.
  */
-async function generateNarratives(dimensions, localityName) {
+async function generateNarratives(dimensions, localityName, profile = 'general') {
+  const profileLabel = PROFILE_LABELS[profile] || PROFILE_LABELS.general;
+
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      // Return fallback narratives for all dimensions
       const fallbacks = {};
       for (const key of DIMENSION_KEYS) {
         const score = dimensions[key]?.score || 50;
-        fallbacks[key] = fallbackNarrative(key, score, localityName);
+        fallbacks[key] = fallbackNarrative(key, score, localityName, profile);
       }
       return fallbacks;
     }
@@ -38,7 +48,11 @@ async function generateNarratives(dimensions, localityName) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-    const prompt = `You are NeighbourScore AI, a neighborhood intelligence assistant helping Indian families make housing decisions. Generate a 2-sentence plain English narrative for each of the 8 dimensions below for the locality: ${localityName}. Use the actual score and raw numbers in your response. Write as if advising a family with young children. Be specific and practical, not generic.
+    const prompt = `You are NeighbourScore AI, a neighborhood intelligence assistant for Indian homebuyers.
+Generate a 2-sentence plain English narrative for each of the 8 dimensions below for the locality: ${localityName}.
+The user has identified themselves as: ${profileLabel}.
+Tailor your language to what matters to this type of person. For example, for a family emphasize what school scores mean for children's education. For a working professional emphasize commute implications. For a retiree emphasize what healthcare access means for day-to-day life. For a property investor emphasize returns and appreciation potential.
+Use the actual score and raw numbers in your response. Be specific and practical, not generic.
 
 Dimensions data:
 ${JSON.stringify(dimensions, null, 2)}
@@ -87,7 +101,7 @@ Respond ONLY with a valid JSON object in this exact format, no markdown, no expl
     const fallbacks = {};
     for (const key of DIMENSION_KEYS) {
       const score = dimensions[key]?.score || 50;
-      fallbacks[key] = fallbackNarrative(key, score, localityName);
+      fallbacks[key] = fallbackNarrative(key, score, localityName, profile);
     }
     return fallbacks;
   }

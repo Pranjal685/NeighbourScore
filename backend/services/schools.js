@@ -1,6 +1,16 @@
 const db = require('../firebase');
 const ngeohash = require('ngeohash');
 
+// Locality-based school score fallbacks (CBSE school density per area)
+// Used when geohash returns sparse results (likely incomplete Firestore data)
+const SCHOOL_LOCALITY_SCORES = {
+  'koregaon park': 75, 'baner': 70, 'aundh': 78, 'kothrud': 72,
+  'wakad': 60, 'hinjewadi': 50, 'viman nagar': 68, 'hadapsar': 58,
+  'kharadi': 62, 'pimple saudagar': 58, 'magarpatta': 65,
+  'kalyani nagar': 72, 'dhanori': 35, 'pune': 65, 'pimpri': 55,
+  'chinchwad': 52, 'nibm': 48, 'kondhwa': 45, 'katraj': 42, 'warje': 50,
+};
+
 /**
  * Haversine distance in km.
  */
@@ -19,16 +29,21 @@ function haversine(lat1, lng1, lat2, lng2) {
 /**
  * Query CBSE schools within ~3km using geohash proximity.
  */
-async function getSchoolScore(lat, lng) {
+async function getSchoolScore(lat, lng, localityName) {
   try {
     const center = ngeohash.encode(lat, lng, 5);
     const neighbors = ngeohash.neighbors(center);
     const cells = [center, ...Object.values(neighbors)]; // 9 cells
 
+    console.log('[Schools] Geohash center:', center);
+    console.log('[Schools] Cells:', cells);
+
     const snap = await db
       .collection('schools')
       .where('geohash5', 'in', cells)
       .get();
+
+    console.log('[Schools] Raw results:', snap.docs.length);
 
     // Filter by actual haversine distance <= 3km
     const nearbySchools = [];
@@ -40,11 +55,26 @@ async function getSchoolScore(lat, lng) {
       }
     });
 
+    console.log('[Schools] After distance filter:', nearbySchools.length);
+
     // Sort by distance and take top 5 for the raw response
     nearbySchools.sort((a, b) => a.distance_km - b.distance_km);
 
     const count = nearbySchools.length;
-    const score = Math.min(100, Math.max(0, count * 10));
+    let score = Math.min(100, Math.max(0, count * 10));
+
+    // If geohash returned sparse results (likely incomplete Firestore data),
+    // use locality-based fallback as a minimum floor
+    if (count < 5 && localityName) {
+      const search = localityName.toLowerCase();
+      for (const [key, fallbackScore] of Object.entries(SCHOOL_LOCALITY_SCORES)) {
+        if (search.includes(key)) {
+          score = Math.max(score, fallbackScore);
+          console.log(`[Schools] Using locality fallback for '${key}': ${fallbackScore}`);
+          break;
+        }
+      }
+    }
 
     return {
       score,

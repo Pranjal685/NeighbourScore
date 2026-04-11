@@ -1,0 +1,7 @@
+/* App-level overrides — minimal since everything uses inline styles and Tailwind */
+
+/* Selection highlight */
+::selection {
+  background: rgba(230, 168, 23, 0.25);
+  color: #E6EDF3;
+}

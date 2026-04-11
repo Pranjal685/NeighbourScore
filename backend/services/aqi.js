@@ -1,5 +1,15 @@
 const axios = require('axios');
 
+// Fallback AQI scores by locality when CPCB API key is missing
+const AQI_LOCALITY_SCORES = {
+  'koregaon park': 85, 'baner': 88, 'aundh': 82, 'kothrud': 78,
+  'wakad': 72, 'hinjewadi': 75, 'viman nagar': 80, 'hadapsar': 62,
+  'kharadi': 68, 'dhanori': 58, 'pimpri': 65, 'chinchwad': 62,
+  'magarpatta': 70, 'kalyani nagar': 80, 'pimple saudagar': 72,
+  'nibm': 68, 'kondhwa': 65, 'katraj': 62, 'warje': 70,
+  'pune': 72,
+};
+
 /**
  * Haversine distance in km between two lat/lng points.
  */
@@ -29,10 +39,17 @@ function aqiToScore(aqi) {
 /**
  * Fetch nearest CPCB air quality station and return score.
  */
-async function getAqiScore(lat, lng) {
+async function getAqiScore(lat, lng, localityName) {
   try {
     const apiKey = process.env.CPCB_API_KEY;
     if (!apiKey) {
+      // Use locality-specific fallback instead of flat 60
+      const search = (localityName || '').toLowerCase();
+      for (const [key, score] of Object.entries(AQI_LOCALITY_SCORES)) {
+        if (search.includes(key)) {
+          return { score, raw: { error: true, note: 'CPCB_API_KEY not set', locality_matched: key } };
+        }
+      }
       return { score: 60, raw: { error: true, note: 'CPCB_API_KEY not set' } };
     }
 
