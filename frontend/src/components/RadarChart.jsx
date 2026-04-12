@@ -24,22 +24,22 @@ const ORDER = ['air_quality', 'school_quality', 'flood_risk', 'healthcare', 'cri
 function CustomTooltip({ active, payload }) {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{
-      background: '#161B22',
-      border: '1px solid rgba(240,246,252,0.1)',
+    <div 
+      className="glass-card"
+      style={{
       borderRadius: 8,
       padding: '8px 12px',
       fontSize: 12,
-      color: '#E6EDF3',
+      color: '#1A1A2E',
       fontFamily: 'var(--font-body)'
     }}>
       <div style={{ fontWeight: 600 }}>{payload[0]?.payload?.dimension}</div>
-      <div style={{ color: '#E6A817', marginTop: 2 }}>{payload[0]?.value}/100</div>
+      <div style={{ color: '#6366F1', marginTop: 2 }}>{payload[0]?.value}/100</div>
     </div>
   );
 }
 
-function NeighbourRadarChart({ dimensions, color = '#E6A817', secondDimensions, secondColor = '#3FB950' }) {
+function NeighbourRadarChart({ dimensions, color = '#6366F1', secondDimensions, secondColor = '#3FB950' }) {
   const data = ORDER.map(key => ({
     dimension: DIMENSION_LABELS[key],
     score: Math.max(dimensions?.[key]?.score ?? 50, 20),
@@ -51,13 +51,13 @@ function NeighbourRadarChart({ dimensions, color = '#E6A817', secondDimensions, 
     <ResponsiveContainer width="100%" height={320}>
       <RadarChart data={data} margin={{ top: 10, right: 28, bottom: 10, left: 28 }}>
         <PolarGrid
-          stroke="rgba(240,246,252,0.06)"
+          stroke="rgba(0,0,0,0.06)"
           gridType="polygon"
         />
         <PolarAngleAxis
           dataKey="dimension"
           tick={{
-            fill: '#8B949E',
+            fill: '#94A3B8',
             fontSize: 12,
             fontFamily: 'DM Sans, sans-serif'
           }}

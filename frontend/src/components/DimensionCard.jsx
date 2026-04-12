@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wind, GraduationCap, Waves, HeartPulse, Shield, Bus, TrendingUp, Leaf, ChevronDown } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Wind, GraduationCap, Waves, HeartPulse, Shield, Bus, TrendingUp, Trees, ChevronDown, X } from 'lucide-react';
 import EvidenceDrawer from './EvidenceDrawer';
 
 export function getScoreColor(score) {
-  if (score === null || score === undefined) return '#484F58';
+  if (score === null || score === undefined) return '#64748B';
   if (score >= 80) return '#3FB950';
   if (score >= 60) return '#E6A817';
   return '#F85149';
@@ -18,11 +19,14 @@ const ICON_MAP = {
   crime_safety:   Shield,
   transport:      Bus,
   property_value: TrendingUp,
-  greenery:       Leaf,
+  greenery:       Trees,
 };
 
 const RAW_STAT = {
-  air_quality:    d => d?.aqi        ? `AQI ${d.aqi} · ${d.station_name || 'Nearest station'}` : null,
+  air_quality:    d => {
+    if (!d?.aqi || d.aqi === 0 || d.fallback) return d?.station_name ? `${d.station_name} · Locality estimate` : 'Locality estimate';
+    return `AQI ${d.aqi} · ${d.station_name || 'Nearest station'}`;
+  },
   school_quality: d => d?.count != null ? `${d.count} CBSE schools · 3km radius` : null,
   flood_risk:     d => d?.in_flood_zone != null ? (d.in_flood_zone ? 'Located in flood zone' : 'Outside flood zone') : null,
   healthcare:     d => d?.count != null ? `${d.count} hospitals · 3km radius` : null,
@@ -34,7 +38,7 @@ const RAW_STAT = {
 
 function ProgressBar({ score, color, delay = 0 }) {
   return (
-    <div style={{ height: 5, background: 'rgba(240,246,252,0.05)', borderRadius: 3, overflow: 'hidden' }}>
+    <div style={{ height: 5, background: 'rgba(0,0,0,0.08)', borderRadius: 3, overflow: 'hidden' }}>
       <motion.div
         initial={{ width: 0 }}
         whileInView={{ width: `${score || 0}%` }}
@@ -59,6 +63,78 @@ function ExpandChevron({ isExpanded, color }) {
   );
 }
 
+// ─── Shared Modal Wrapper ────────────────────────────────────────────────────────
+function EvidenceModal({ isExpanded, setIsExpanded, dimensionKey, name, color, raw, displayScore }) {
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <AnimatePresence>
+      {isExpanded && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          onClick={(e) => { e.stopPropagation(); setIsExpanded(false); }}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            background: 'rgba(240,244,255,0.75)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            cursor: 'auto'
+          }}
+        >
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            onClick={(e) => e.stopPropagation()}
+            className="glass-card"
+            style={{
+              width: '100%',
+              maxWidth: 500,
+              maxHeight: '85vh',
+              overflowY: 'auto',
+              position: 'relative',
+              background: 'rgba(255, 255, 255, 0.95)',
+              borderTop: `4px solid ${color}`,
+              padding: '24px',
+              cursor: 'default',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.1)'
+            }}
+          >
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <div style={{ fontSize: 18, fontWeight: 700, color: '#1A1A2E' }}>{name} Data</div>
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsExpanded(false); }}
+                style={{ 
+                  background: 'rgba(0,0,0,0.05)', border: 'none', 
+                  borderRadius: '50%', width: 32, height: 32, 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', color: '#64748B'
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            
+            <EvidenceDrawer dimensionKey={dimensionKey} raw={raw} score={displayScore} />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body
+  );
+}
+
 // TIER 1 — large card (School, Air, Flood) — full Gemini narrative + big score
 export function Tier1Card({ dimensionKey, name, score, weight, narrative, raw, index }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -74,9 +150,8 @@ export function Tier1Card({ dimensionKey, name, score, weight, narrative, raw, i
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.08 }}
       onClick={() => setIsExpanded(!isExpanded)}
+      className="glass-card"
       style={{
-        background: 'var(--bg-surface)',
-        border: '1px solid var(--border)',
         borderTop: `3px solid ${color}`,
         borderRadius: 16,
         padding: '22px',
@@ -90,15 +165,15 @@ export function Tier1Card({ dimensionKey, name, score, weight, narrative, raw, i
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
-            width: 36, height: 36, borderRadius: 10,
-            background: `${color}18`, border: `1px solid ${color}28`,
+            width: 36, height: 36, borderRadius: 8,
+            background: `${color}1a`, border: `1px solid ${color}28`,
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
           }}>
-            <Icon size={16} color={color} />
+            <Icon size={18} color={color} strokeWidth={1.5} />
           </div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '-0.01em' }}>{name}</div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>Weight: {weight}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#94A3B8', letterSpacing: '-0.01em' }}>{name}</div>
+            <div style={{ fontSize: 11, color: '#64748B', marginTop: 1 }}>Weight: {weight}</div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -138,25 +213,20 @@ export function Tier1Card({ dimensionKey, name, score, weight, narrative, raw, i
       )}
 
       {/* Narrative */}
-      <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7, margin: 0 }}>
+      <p style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.7, margin: 0 }}>
         {narrative || 'AI analysis unavailable for this dimension.'}
       </p>
 
-      {/* Evidence Drawer */}
-      <AnimatePresence initial={false}>
-        {isExpanded && (
-          <motion.div
-            key="drawer"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            style={{ overflow: 'hidden' }}
-          >
-            <EvidenceDrawer dimensionKey={dimensionKey} raw={raw} score={displayScore} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Evidence Modal */}
+      <EvidenceModal
+        isExpanded={isExpanded}
+        setIsExpanded={setIsExpanded}
+        dimensionKey={dimensionKey}
+        name={name}
+        color={color}
+        raw={raw}
+        displayScore={displayScore}
+      />
     </motion.div>
   );
 }
@@ -176,9 +246,8 @@ export function Tier2Card({ dimensionKey, name, score, weight, narrative, raw, i
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.08 }}
       onClick={() => setIsExpanded(!isExpanded)}
+      className="glass-card"
       style={{
-        background: 'var(--bg-elevated)',
-        border: '1px solid var(--border)',
         borderLeft: `3px solid ${color}`,
         borderRadius: 14,
         padding: '18px 20px',
@@ -192,13 +261,13 @@ export function Tier2Card({ dimensionKey, name, score, weight, narrative, raw, i
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{
-            width: 30, height: 30, borderRadius: 8,
-            background: `${color}14`, border: `1px solid ${color}22`,
+            width: 36, height: 36, borderRadius: 8,
+            background: `${color}1a`, border: `1px solid ${color}22`,
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
           }}>
-            <Icon size={13} color={color} />
+            <Icon size={18} color={color} strokeWidth={1.5} />
           </div>
-          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>{name}</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#94A3B8' }}>{name}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{
@@ -220,31 +289,26 @@ export function Tier2Card({ dimensionKey, name, score, weight, narrative, raw, i
 
       {/* Stat */}
       {stat && (
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>{stat}</div>
+        <div style={{ fontSize: 11, color: '#64748B', fontWeight: 500 }}>{stat}</div>
       )}
 
       {/* Narrative */}
-      <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.65, margin: 0 }}>
+      <p style={{ fontSize: 12, color: '#94A3B8', lineHeight: 1.65, margin: 0 }}>
         {narrative || 'Analysis data unavailable.'}
       </p>
 
-      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>Weight: {weight}</div>
+      <div style={{ fontSize: 10, color: '#64748B', marginTop: 2 }}>Weight: {weight}</div>
 
-      {/* Evidence Drawer */}
-      <AnimatePresence initial={false}>
-        {isExpanded && (
-          <motion.div
-            key="drawer"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            style={{ overflow: 'hidden' }}
-          >
-            <EvidenceDrawer dimensionKey={dimensionKey} raw={raw} score={displayScore} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Evidence Modal */}
+      <EvidenceModal
+        isExpanded={isExpanded}
+        setIsExpanded={setIsExpanded}
+        dimensionKey={dimensionKey}
+        name={name}
+        color={color}
+        raw={raw}
+        displayScore={displayScore}
+      />
     </motion.div>
   );
 }
@@ -264,9 +328,8 @@ export function Tier3Card({ dimensionKey, name, score, weight, narrative, raw, i
       viewport={{ once: true }}
       transition={{ duration: 0.45, delay: index * 0.08 }}
       onClick={() => setIsExpanded(!isExpanded)}
+      className="glass-card"
       style={{
-        background: 'var(--bg-surface)',
-        border: '1px solid var(--border)',
         borderRadius: 12,
         padding: '16px 18px',
         display: 'flex',
@@ -279,13 +342,13 @@ export function Tier3Card({ dimensionKey, name, score, weight, narrative, raw, i
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{
-            width: 26, height: 26, borderRadius: 7,
-            background: `${color}12`, border: `1px solid ${color}1e`,
+            width: 36, height: 36, borderRadius: 8,
+            background: `${color}1a`, border: `1px solid ${color}1e`,
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
           }}>
-            <Icon size={11} color={color} />
+            <Icon size={18} color={color} strokeWidth={1.5} />
           </div>
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)' }}>{name}</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: '#94A3B8' }}>{name}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{
@@ -305,29 +368,24 @@ export function Tier3Card({ dimensionKey, name, score, weight, narrative, raw, i
       {/* Progress bar */}
       <ProgressBar score={displayScore} color={color} delay={0.1 + index * 0.06} />
 
-      {stat && <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{stat}</div>}
+      {stat && <div style={{ fontSize: 11, color: '#64748B' }}>{stat}</div>}
 
-      <p style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
+      <p style={{ fontSize: 11.5, color: '#64748B', lineHeight: 1.6, margin: 0 }}>
         {narrative || 'Analysis data unavailable.'}
       </p>
 
-      <div style={{ fontSize: 10, color: 'var(--text-hint)', textAlign: 'right' }}>Weight: {weight}</div>
+      <div style={{ fontSize: 10, color: 'rgba(26,26,46,0.3)', textAlign: 'right' }}>Weight: {weight}</div>
 
-      {/* Evidence Drawer */}
-      <AnimatePresence initial={false}>
-        {isExpanded && (
-          <motion.div
-            key="drawer"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            style={{ overflow: 'hidden' }}
-          >
-            <EvidenceDrawer dimensionKey={dimensionKey} raw={raw} score={displayScore} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Evidence Modal */}
+      <EvidenceModal
+        isExpanded={isExpanded}
+        setIsExpanded={setIsExpanded}
+        dimensionKey={dimensionKey}
+        name={name}
+        color={color}
+        raw={raw}
+        displayScore={displayScore}
+      />
     </motion.div>
   );
 }

@@ -19,8 +19,23 @@ function SearchBar({ onSearch, isLoading }) {
       const name = place.formatted_address || place.name;
       setInputValue(name);
       onSearch(lat, lng, name);
+    } else if (inputValue.trim()) {
+      if (!window.google) return;
+      const geocoder = new window.google.maps.Geocoder();
+      const query = inputValue.toLowerCase().includes('pune') ? inputValue : `${inputValue}, Pune, India`;
+      geocoder.geocode({ address: query }, (results, status) => {
+        if (status === 'OK' && results[0]) {
+          const lat = results[0].geometry.location.lat();
+          const lng = results[0].geometry.location.lng();
+          const name = results[0].formatted_address;
+          setInputValue(name);
+          onSearch(lat, lng, name);
+        } else {
+          alert('Could not find this location. Please try selecting from the dropdown.');
+        }
+      });
     }
-  }, [onSearch]);
+  }, [onSearch, inputValue]);
 
   const onPlaceChanged = useCallback(() => {
     triggerSearch();
@@ -43,15 +58,15 @@ function SearchBar({ onSearch, isLoading }) {
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        background: 'var(--bg-surface)',
-        border: `1px solid ${isFocused ? 'rgba(230,168,23,0.4)' : 'var(--border-mid)'}`,
-        borderRadius: 14,
+        background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255,255,255,0.9)',
+        borderRadius: 16,
         padding: '5px 5px 5px 16px',
         width: '100%',
-        boxShadow: isFocused ? '0 0 0 3px rgba(230,168,23,0.1), 0 8px 32px rgba(0,0,0,0.3)' : '0 4px 16px rgba(0,0,0,0.2)',
+        boxShadow: isFocused ? '0 0 0 3px rgba(99,102,241,0.2), 0 8px 32px rgba(99,102,241,0.1)' : '0 8px 32px rgba(99,102,241,0.1), 0 2px 8px rgba(0,0,0,0.06)',
         transition: 'all 0.25s ease'
       }}>
-        <Search size={16} color={isFocused ? '#E6A817' : 'var(--text-muted)'} style={{ flexShrink: 0, transition: 'color 0.2s' }} />
+        <Search size={16} color={isFocused ? '#6366F1' : '#94A3B8'} style={{ flexShrink: 0, transition: 'color 0.2s' }} />
         <input
           type="text"
           placeholder="Search locality e.g. Wakad, Baner, Kothrud..."
@@ -64,7 +79,7 @@ function SearchBar({ onSearch, isLoading }) {
             background: 'transparent',
             border: 'none',
             outline: 'none',
-            color: 'var(--text-primary)',
+            color: '#1A1A2E',
             fontSize: 15,
             flex: 1,
             padding: '9px 12px',
@@ -75,10 +90,10 @@ function SearchBar({ onSearch, isLoading }) {
           onClick={triggerSearch}
           disabled={isLoading}
           style={{
-            background: isLoading ? 'rgba(230,168,23,0.7)' : 'var(--accent)',
-            color: '#0D1117',
+            background: isLoading ? 'linear-gradient(135deg, rgba(99,102,241,0.7), rgba(139,92,246,0.7))' : 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+            color: 'white',
             border: 'none',
-            borderRadius: 10,
+            borderRadius: 12,
             padding: '10px 24px',
             fontSize: 14,
             fontWeight: 700,
@@ -86,13 +101,14 @@ function SearchBar({ onSearch, isLoading }) {
             display: 'flex',
             alignItems: 'center',
             gap: 8,
+            boxShadow: '0 4px 20px rgba(99,102,241,0.4)',
             fontFamily: 'var(--font-body)',
             transition: 'all 0.2s',
             whiteSpace: 'nowrap',
             flexShrink: 0
           }}
-          onMouseEnter={e => { if (!isLoading) e.currentTarget.style.background = '#F5B82B'; }}
-          onMouseLeave={e => { if (!isLoading) e.currentTarget.style.background = 'var(--accent)'; }}
+          onMouseEnter={e => { if (!isLoading) e.currentTarget.style.opacity = 0.9; }}
+          onMouseLeave={e => { if (!isLoading) e.currentTarget.style.opacity = 1; }}
         >
           {isLoading && <Loader2 size={14} style={{ animation: 'spin 0.8s linear infinite' }} />}
           {isLoading ? 'Analyzing...' : 'Analyze'}

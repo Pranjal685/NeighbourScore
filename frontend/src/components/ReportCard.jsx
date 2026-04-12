@@ -60,7 +60,7 @@ function ReportCard({ data, onCompare }) {
           <h1 style={{
             fontSize: '22px',
             fontWeight: 700,
-            color: '#F1F5F9',
+            color: '#1A1A2E',
             margin: 0,
             letterSpacing: '-0.02em'
           }}>
@@ -68,7 +68,7 @@ function ReportCard({ data, onCompare }) {
           </h1>
           <p style={{
             fontSize: '13px',
-            color: '#64748B',
+            color: '#94A3B8',
             marginTop: '4px',
             margin: '4px 0 0 0'
           }}>
@@ -105,11 +105,8 @@ function ReportCard({ data, onCompare }) {
 
       {/* Overall score card */}
       <div
-        className="animate-fade-in"
+        className="animate-fade-in glass-card"
         style={{
-          background: '#111827',
-          border: '1px solid #1E293B',
-          borderRadius: '16px',
           padding: '24px',
           display: 'flex',
           alignItems: 'center',
@@ -139,14 +136,14 @@ function ReportCard({ data, onCompare }) {
           <h2 style={{
             fontSize: '16px',
             fontWeight: 600,
-            color: '#F1F5F9',
+            color: '#1A1A2E',
             margin: '0 0 8px 0'
           }}>
             NeighbourScore
           </h2>
           <p style={{
             fontSize: '13px',
-            color: '#64748B',
+            color: '#94A3B8',
             lineHeight: 1.7,
             margin: 0
           }}>

@@ -89,9 +89,9 @@ function CompareMode({ firstResult, profile = 'general' }) {
 
   return (
     <div style={{ marginTop: 40 }}>
-      <div style={{
-        background: 'var(--bg-surface)',
-        border: '1px solid var(--border)',
+      <div 
+        className="glass-card"
+        style={{
         borderRadius: 20,
         padding: '24px'
       }}>
@@ -99,7 +99,7 @@ function CompareMode({ firstResult, profile = 'general' }) {
           fontFamily: 'var(--font-heading)',
           fontSize: 16,
           fontWeight: 700,
-          color: 'var(--text-primary)',
+          color: '#1A1A2E',
           marginBottom: 16,
           letterSpacing: '-0.02em'
         }}>
@@ -138,7 +138,7 @@ function CompareMode({ firstResult, profile = 'general' }) {
                 background: 'transparent',
                 border: 'none',
                 outline: 'none',
-                color: 'var(--text-primary)',
+                color: '#1A1A2E',
                 fontSize: 13,
                 flex: 1,
                 fontFamily: 'var(--font-body)'
@@ -179,15 +179,15 @@ function CompareMode({ firstResult, profile = 'general' }) {
                   {bannerPrefix && (
                     <><strong style={{ color: '#E6A817' }}>{bannerPrefix}:</strong>{' '}</>
                   )}
-                  <strong style={{ color: 'var(--text-primary)' }}>{winnerName}</strong>{' '}
+                  <strong style={{ color: '#1A1A2E' }}>{winnerName}</strong>{' '}
                   scores {winnerComposite} vs{' '}
-                  <strong style={{ color: 'var(--text-primary)' }}>
+                  <strong style={{ color: '#1A1A2E' }}>
                     {winner === second ? firstName : secondName}
                   </strong>{' '}
                   scores {loserComposite}
                   {topDimensions.length > 0 && (
                     <> — wins on{' '}
-                      <strong style={{ color: 'var(--text-primary)' }}>
+                      <strong style={{ color: '#1A1A2E' }}>
                         {topDimensions.join(', ')}
                       </strong>
                     </>
@@ -200,15 +200,14 @@ function CompareMode({ firstResult, profile = 'general' }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
+                className="glass-card"
                 style={{
-                  background: 'var(--bg-elevated)',
-                  border: '1px solid var(--border)',
                   borderRadius: 14,
                   padding: '16px',
                   marginBottom: 16
                 }}
               >
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8, display: 'flex', gap: 16 }}>
+                <div style={{ fontSize: 11, color: '#64748B', marginBottom: 8, display: 'flex', gap: 16 }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                     <span style={{ width: 10, height: 2, background: '#E6A817', display: 'inline-block', borderRadius: 1 }} />
                     {firstName}
@@ -272,7 +271,7 @@ function CompareCard({ name, data, isWinner, otherData }) {
         </span>
       )}
 
-      <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
+      <div style={{ fontSize: 15, fontWeight: 700, color: '#1A1A2E', marginBottom: 4 }}>
         {name}
       </div>
       <div style={{
@@ -303,15 +302,15 @@ function CompareCard({ name, data, isWinner, otherData }) {
             padding: '5px 0',
             borderBottom: '1px solid var(--border)'
           }}>
-            <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>{dim.label}</span>
+            <span style={{ fontSize: 11.5, color: '#64748B' }}>{dim.label}</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               {!isTie && isBetter && <TrendingUp size={10} color="#3FB950" />}
               {!isTie && !isBetter && <TrendingDown size={10} color="#F85149" />}
-              {isTie && <Minus size={10} color="#484F58" />}
+              {isTie && <Minus size={10} color="#94A3B8" />}
               <span style={{
                 fontSize: 11.5,
                 fontWeight: 600,
-                color: isTie ? '#484F58' : isBetter ? '#3FB950' : '#F85149'
+                color: isTie ? '#64748B' : isBetter ? '#3FB950' : '#F85149'
               }}>
                 {display}
               </span>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { AlertOctagon } from 'lucide-react';
 
 function getRedFlags(dimensions) {
   if (!dimensions) return [];
@@ -100,7 +101,7 @@ function RedFlagAlert({ dimensions }) {
       {/* Header row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 16 }}>⚠️</span>
+          <AlertOctagon size={20} color="#EF4444" strokeWidth={1.5} />
           <span style={{ fontSize: 15, fontWeight: 600, color: '#F87171' }}>Red Flags Detected</span>
         </div>
         <span style={{
@@ -130,7 +131,7 @@ function RedFlagAlert({ dimensions }) {
               <div style={{ fontSize: 13, fontWeight: 500, color: '#F87171', lineHeight: 1.3 }}>
                 {flag.dimension}
               </div>
-              <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 13, color: '#64748B', marginTop: 2, lineHeight: 1.5 }}>
                 {flag.message}
               </div>
             </div>

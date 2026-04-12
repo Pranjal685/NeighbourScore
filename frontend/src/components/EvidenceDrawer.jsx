@@ -1,10 +1,10 @@
 import React from 'react';
 
 const drawerStyle = {
-  borderTop: '1px solid rgba(255,255,255,0.06)',
+  borderTop: '1px solid rgba(0,0,0,0.06)',
   marginTop: 12,
   paddingTop: 14,
-  background: 'rgba(0,0,0,0.15)',
+  background: 'rgba(255,255,255,0.3)',
   borderRadius: '0 0 12px 12px',
   padding: '14px 16px',
 };
@@ -20,19 +20,19 @@ const sectionLabel = {
 
 const valueText = {
   fontSize: 14,
-  color: 'var(--text-primary)',
+  color: '#1A1A2E',
 };
 
 const mutedText = {
   fontSize: 12,
-  color: 'var(--text-muted)',
+  color: '#64748B',
   marginTop: 4,
 };
 
 const badgeStyle = {
   display: 'inline-block',
-  background: 'rgba(255,255,255,0.06)',
-  color: 'var(--text-muted)',
+  background: 'rgba(0,0,0,0.04)',
+  color: '#64748B',
   fontSize: 10,
   padding: '2px 8px',
   borderRadius: 100,
@@ -65,10 +65,10 @@ function AqiScaleBar({ aqi }) {
   const zone = getAqiZone(aqi);
   return (
     <div style={{ marginTop: 10 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#64748B', marginBottom: 4 }}>
         <span>0 — Good</span><span>500 — Severe</span>
       </div>
-      <div style={{ height: 8, borderRadius: 4, background: 'rgba(255,255,255,0.08)', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ height: 8, borderRadius: 4, background: 'rgba(0,0,0,0.08)', position: 'relative', overflow: 'hidden' }}>
         <div style={{
           height: '100%',
           width: `${pct}%`,
@@ -97,9 +97,8 @@ function NewsCard({ article }) {
       target="_blank"
       rel="noopener noreferrer"
       style={{
-        display: 'block',
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.06)',
+        background: 'rgba(255,255,255,0.4)',
+        border: '1px solid rgba(0,0,0,0.06)',
         borderRadius: 8,
         padding: '10px 12px',
         marginBottom: 6,
@@ -107,11 +106,11 @@ function NewsCard({ article }) {
         textDecoration: 'none',
         transition: 'border-color 0.2s',
       }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'}
-      onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'}
+      onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(0,0,0,0.15)'}
+      onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(0,0,0,0.06)'}
     >
-      <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{headline}</div>
-      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 4 }}>
+      <div style={{ fontSize: 12, color: '#94A3B8', lineHeight: 1.5 }}>{headline}</div>
+      <div style={{ fontSize: 10, color: '#64748B', marginTop: 4 }}>
         {article.source} &nbsp;·&nbsp; {date}
         <span style={{ float: 'right', opacity: 0.5 }}>↗</span>
       </div>
@@ -123,21 +122,40 @@ function NewsCard({ article }) {
 
 function AirQualityEvidence({ raw }) {
   const aqi = raw?.aqi ?? null;
+  const isMissing = aqi === null || aqi === 0 || raw?.fallback;
   return (
     <div>
       <div style={sectionLabel}>Air Quality Index</div>
       {raw?.station_name && (
         <div style={mutedText}>Station: {raw.station_name}</div>
       )}
-      {aqi !== null ? (
-        <AqiScaleBar aqi={aqi} />
+      {isMissing ? (
+        <div style={{
+          background: 'rgba(230,168,23,0.08)',
+          border: '1px solid rgba(230,168,23,0.2)',
+          borderRadius: 8,
+          padding: '10px 12px',
+          marginTop: 8,
+        }}>
+          <div style={{ fontSize: 13, color: '#E6A817', fontWeight: 600 }}>
+            Station data temporarily unavailable
+          </div>
+          <div style={{ fontSize: 12, color: '#64748B', marginTop: 4 }}>
+            {raw?.note || 'The nearest CPCB station is not reporting a current reading. Score is based on a locality-level estimate.'}
+          </div>
+          {raw?.locality_matched && (
+            <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>
+              Estimate based on: {raw.locality_matched}
+            </div>
+          )}
+        </div>
       ) : (
-        <div style={mutedText}>AQI data unavailable for this area</div>
+        <AqiScaleBar aqi={aqi} />
       )}
       <div style={{ ...mutedText, marginTop: 10 }}>
         Worst months: November, December, January
       </div>
-      <SourceBadge label="CPCB Real-time API" />
+      <SourceBadge label={isMissing ? 'Locality Estimate' : 'CPCB Real-time API'} />
     </div>
   );
 }
@@ -154,13 +172,13 @@ function SchoolQualityEvidence({ raw }) {
           {schools.slice(0, 5).map((s, i) => (
             <div key={i} style={{
               fontSize: 12,
-              color: 'var(--text-secondary)',
+              color: '#94A3B8',
               padding: '5px 0',
-              borderBottom: i < schools.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+              borderBottom: i < schools.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none',
             }}>
               <span style={{ fontWeight: 600 }}>{s.name || s}</span>
-              {s.category && <span style={{ color: 'var(--text-muted)', marginLeft: 6 }}>· {s.category}</span>}
-              {s.distance && <span style={{ color: 'var(--text-muted)', marginLeft: 6 }}>· {typeof s.distance === 'number' ? `${s.distance.toFixed(1)} km` : s.distance}</span>}
+              {s.category && <span style={{ color: '#64748B', marginLeft: 6 }}>· {s.category}</span>}
+              {s.distance && <span style={{ color: '#64748B', marginLeft: 6 }}>· {typeof s.distance === 'number' ? `${s.distance.toFixed(1)} km` : s.distance}</span>}
             </div>
           ))}
         </div>
@@ -231,13 +249,13 @@ function HealthcareEvidence({ raw }) {
           {hospitals.slice(0, 5).map((h, i) => (
             <div key={i} style={{
               fontSize: 12,
-              color: 'var(--text-secondary)',
+              color: '#94A3B8',
               padding: '5px 0',
-              borderBottom: i < hospitals.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+              borderBottom: i < hospitals.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none',
             }}>
               <span style={{ fontWeight: 600 }}>{h.name || h}</span>
               {h.rating && <span style={{ color: '#E6A817', marginLeft: 6 }}>★ {h.rating}</span>}
-              {h.vicinity && <span style={{ color: 'var(--text-muted)', marginLeft: 6 }}>· {h.vicinity}</span>}
+              {h.vicinity && <span style={{ color: '#64748B', marginLeft: 6 }}>· {h.vicinity}</span>}
             </div>
           ))}
         </div>
@@ -300,7 +318,7 @@ function TransportEvidence({ raw }) {
       {stops.length > 0 && (
         <div style={{ marginTop: 8 }}>
           {stops.slice(0, 5).map((s, i) => (
-            <div key={i} style={{ fontSize: 12, color: 'var(--text-secondary)', padding: '3px 0' }}>
+            <div key={i} style={{ fontSize: 12, color: '#94A3B8', padding: '3px 0' }}>
               · {typeof s === 'string' ? s : s.name || s}
             </div>
           ))}
@@ -326,8 +344,8 @@ function PropertyValueEvidence({ raw, score }) {
     <div>
       <div style={sectionLabel}>Property Market</div>
       {price != null && (
-        <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.03em' }}>
-          ₹{price.toLocaleString('en-IN')} <span style={{ fontSize: 14, fontWeight: 400, color: 'var(--text-muted)' }}>/ sqft</span>
+        <div style={{ fontSize: 22, fontWeight: 800, color: '#1A1A2E', letterSpacing: '-0.03em' }}>
+          ₹{price.toLocaleString('en-IN')} <span style={{ fontSize: 14, fontWeight: 400, color: '#64748B' }}>/ sqft</span>
         </div>
       )}
       {trend != null && (
@@ -338,7 +356,7 @@ function PropertyValueEvidence({ raw, score }) {
       <div style={{ marginTop: 8, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
         <span style={{
           ...badgeStyle,
-          background: freshness === 'live' ? 'rgba(63,185,80,0.1)' : 'rgba(255,255,255,0.06)',
+          background: freshness === 'live' ? 'rgba(63,185,80,0.1)' : 'rgba(0,0,0,0.06)',
           color: freshness === 'live' ? '#3FB950' : 'var(--text-muted)',
         }}>
           {freshness === 'live' ? '🟢 Live data 2026' : '📅 Estimated 2024'}
@@ -362,7 +380,7 @@ function GreeneryEvidence({ raw, score }) {
       {parks.length > 0 && (
         <div style={{ marginTop: 8 }}>
           {parks.slice(0, 5).map((p, i) => (
-            <div key={i} style={{ fontSize: 12, color: 'var(--text-secondary)', padding: '3px 0' }}>
+            <div key={i} style={{ fontSize: 12, color: '#94A3B8', padding: '3px 0' }}>
               · {typeof p === 'string' ? p : p.name || p}
             </div>
           ))}

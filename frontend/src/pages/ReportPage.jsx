@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { GitCompare, Info, Cpu } from 'lucide-react';
+import { GitCompare, Info, Cpu, MapPin, LayoutGrid, Map } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import ScoreGauge, { getScoreColor, getScoreLabel } from '../components/ScoreGauge';
 import DimensionGrid from '../components/DimensionGrid';
@@ -72,7 +72,7 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      style={{ minHeight: '100vh', background: 'var(--bg-base)' }}
+      style={{ minHeight: '100vh', background: 'transparent' }}
     >
       <Navbar onNewSearch={onNewSearch} locality={result.locality} />
 
@@ -91,14 +91,18 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
                 fontFamily: 'var(--font-heading)',
                 fontSize: 'clamp(28px, 4vw, 42px)',
                 fontWeight: 700,
-                color: 'var(--text-primary)',
+                color: '#1A1A2E',
                 letterSpacing: '-0.03em',
                 marginBottom: 6,
-                lineHeight: 1.15
+                lineHeight: 1.15,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12
               }}>
+                <MapPin size={28} color="#6366F1" strokeWidth={1.5} />
                 {result.locality}
               </h1>
-              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: profileMeta ? 12 : 32 }}>
+              <p style={{ fontSize: 14, color: '#64748B', marginBottom: profileMeta ? 12 : 32 }}>
                 Pune District, Maharashtra &nbsp;·&nbsp; analyzed with verified government data
               </p>
 
@@ -139,7 +143,7 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
                   }}>
                     {composite}
                   </div>
-                  <div style={{ fontSize: 18, color: 'var(--text-muted)', marginTop: 4 }}>/ 100</div>
+                  <div style={{ fontSize: 18, color: '#64748B', marginTop: 4 }}>/ 100</div>
                   <motion.div
                     initial={{ opacity: 0, scale: 0.85 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -163,13 +167,10 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
             </div>
 
             {/* Right: radar chart */}
-            <div style={{
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border)',
-              borderRadius: 20,
-              padding: '20px 16px 8px'
-            }}>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4, paddingLeft: 8 }}>
+            <div 
+              className="glass-card"
+              style={{ padding: '20px 16px 8px', borderRadius: 20 }}>
+              <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4, paddingLeft: 8 }}>
                 8-Dimension Profile
               </div>
               <NeighbourRadarChart dimensions={result.dimensions} name={result.locality} />
@@ -178,8 +179,9 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
 
           {/* AI Narrative */}
           {result.overall_narrative && (
-            <div style={{
-              background: 'var(--bg-surface)',
+            <div
+              className="glass-card"
+              style={{
               border: '1px solid var(--accent-border)',
               borderRadius: 14,
               padding: '20px 24px',
@@ -195,10 +197,11 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
                 <Cpu size={15} color="#E6A817" />
               </div>
               <div>
-                <div style={{ fontSize: 12, color: 'var(--accent)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>
+                <div style={{ fontSize: 12, color: 'var(--accent)', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Cpu size={14} color="var(--accent)" strokeWidth={1.5} />
                   AI Analysis · Powered by Gemini
                 </div>
-                <p style={{ fontSize: 15, color: 'var(--text-secondary)', lineHeight: 1.75, margin: 0 }}>
+                <p style={{ fontSize: 15, color: '#94A3B8', lineHeight: 1.75, margin: 0 }}>
                   {result.overall_narrative}
                 </p>
               </div>
@@ -208,7 +211,9 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
 
         {/* ── PART 2: Dimension Breakdown ── */}
         <motion.div {...inView} style={{ marginBottom: 48 }}>
-          <SectionLabel>Dimension Breakdown</SectionLabel>
+          <SectionLabel>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><LayoutGrid size={14} color="#94A3B8" strokeWidth={1.5} /> Dimension Breakdown</span>
+          </SectionLabel>
 
           {/* Red Flag Alerts — above the grid */}
           <RedFlagAlert dimensions={result.dimensions} />
@@ -225,8 +230,10 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
         {/* ── PART 3: Map ── */}
         {lat && lng && (
           <motion.div {...inView} style={{ marginBottom: 48 }}>
-            <SectionLabel>Location Map</SectionLabel>
-            <div className="map-bleed" style={{ position: 'relative', overflow: 'hidden', border: '1px solid var(--border)', height: 320 }}>
+            <SectionLabel>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Map size={14} color="#94A3B8" strokeWidth={1.5} /> Location Map</span>
+            </SectionLabel>
+            <div className="map-bleed" style={{ position: 'relative', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.85)', height: 320 }}>
               <MapView lat={lat} lng={lng} />
               <div style={{
                 position: 'absolute',
@@ -239,7 +246,7 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
                 padding: '6px 14px',
                 fontSize: 13,
                 fontWeight: 600,
-                color: 'var(--text-primary)',
+                color: '#1A1A2E',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6
@@ -284,7 +291,7 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
                 e.currentTarget.style.borderColor = 'var(--accent-border)';
               }}
             >
-              <GitCompare size={15} />
+              <GitCompare size={15} strokeWidth={1.5} />
               + Compare with another locality
             </button>
           </motion.div>
@@ -313,19 +320,19 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
           }}
         >
           {/* Disclaimer */}
-          <div style={{
+          <div 
+            className="glass-card"
+            style={{
             display: 'flex',
             gap: 10,
             alignItems: 'flex-start',
-            background: 'var(--bg-surface)',
-            border: '1px solid var(--border)',
             borderRadius: 12,
             padding: '14px 18px',
             marginBottom: 12
           }}>
             <Info size={13} color="var(--text-muted)" style={{ marginTop: 2, flexShrink: 0 }} />
-            <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.75, margin: 0 }}>
-              <strong style={{ color: 'var(--text-secondary)' }}>Data disclaimer:</strong>{' '}
+            <p style={{ fontSize: 12, color: '#64748B', lineHeight: 1.75, margin: 0 }}>
+              <strong style={{ color: '#94A3B8' }}>Data disclaimer:</strong>{' '}
               Crime data is district-level (NCRB 2023) — all Pune localities share the same district score.
               Property trends are from aggregated 2024 market data, updated periodically.
               AQI reflects the nearest CPCB monitoring station, not hyperlocal air quality.
@@ -333,10 +340,10 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
             </p>
           </div>
 
-          <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center' }}>
+          <p style={{ fontSize: 12, color: '#64748B', textAlign: 'center' }}>
             Data sourced from CPCB · CBSE · NDMA · NCRB · Google Maps
           </p>
-          <p style={{ fontSize: 11, color: 'var(--text-hint)', textAlign: 'center' }}>
+          <p style={{ fontSize: 11, color: 'rgba(26,26,46,0.3)', textAlign: 'center' }}>
             Last updated: {timestamp} &nbsp;·&nbsp; NeighbourScore · Google Solution Challenge 2026
           </p>
         </motion.div>

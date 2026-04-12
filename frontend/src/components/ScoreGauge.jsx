@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useCountUp } from '../hooks/useCountUp';
 
 export function getScoreColor(score) {
-  if (score === null || score === undefined) return '#484F58';
+  if (score === null || score === undefined) return '#64748B';
   if (score >= 80) return '#3FB950';
   if (score >= 60) return '#E6A817';
   return '#F85149';
@@ -57,7 +57,7 @@ function ScoreGauge({ score }) {
         <circle
           cx={cx} cy={cy} r={radius}
           fill="none"
-          stroke="rgba(240,246,252,0.05)"
+          stroke="rgba(0,0,0,0.08)"
           strokeWidth={strokeWidth}
         />
 
@@ -94,7 +94,7 @@ function ScoreGauge({ score }) {
         <text
           x={cx} y={cy + 36}
           textAnchor="middle"
-          fill="#484F58"
+          fill="#94A3B8"
           style={{
             fontSize: 12,
             fontFamily: 'Plus Jakarta Sans, sans-serif'

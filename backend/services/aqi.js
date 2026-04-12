@@ -143,7 +143,41 @@ async function getAqiScore(lat, lng, localityName) {
 
     console.log(`[AQI] Nearest station: ${nearest.station || nearest.city || 'unknown'} at ${Math.round(minDist)}km`);
 
-    const aqi = parseFloat(nearest.pollutant_avg) || 0;
+    const aqiRaw = parseFloat(nearest.pollutant_avg);
+    const aqi = isNaN(aqiRaw) ? null : aqiRaw;
+
+    // Station returned AQI 0 or null — sensor has no current reading.
+    // Fall back to locality-based estimate instead of scoring 100.
+    if (!aqi || aqi === 0) {
+      console.log(`[AQI] Station "${nearest.station || nearest.city}" returned AQI=${aqiRaw} — treating as missing, using locality fallback`);
+      const search = (localityName || '').toLowerCase();
+      for (const [key, fallbackScore] of Object.entries(AQI_LOCALITY_SCORES)) {
+        if (search.includes(key)) {
+          return {
+            score: fallbackScore,
+            raw: {
+              aqi: 0,
+              station_name: nearest.station || nearest.city || 'Unknown',
+              distance_km: Math.round(minDist * 10) / 10,
+              fallback: true,
+              note: 'Station reading unavailable, using locality estimate',
+              locality_matched: key,
+            },
+          };
+        }
+      }
+      return {
+        score: 60,
+        raw: {
+          aqi: 0,
+          station_name: nearest.station || nearest.city || 'Unknown',
+          distance_km: Math.round(minDist * 10) / 10,
+          fallback: true,
+          note: 'Station reading unavailable, using default estimate',
+        },
+      };
+    }
+
     const score = Math.min(100, Math.max(0, aqiToScore(aqi)));
 
     return {

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  AlertCircle, BookOpen, Droplets,
-  Wind, GraduationCap, Waves,
-  Shield, Database, Map, ArrowRight, CheckCircle
+  Wind, GraduationCap, Waves, Shield, Map,
+  Trees, TrendingUp, Bus, HeartPulse, BarChart3,
+  MapPin, Database, LayoutGrid, Star, Users,
+  AlertTriangle, Navigation, ArrowUpRight,
+  GitCompare, Search, AlertOctagon, Info,
+  BarChart2, Cpu, Award, ArrowRight, CheckCircle
 } from 'lucide-react';
 import SearchBar from '../components/SearchBar';
 import ProfileSelector from '../components/ProfileSelector';
@@ -32,7 +35,7 @@ function StaticGauge({ score, size = 88 }) {
   const color = getBarColor(score);
   return (
     <svg width={size} height={size} viewBox="0 0 88 88">
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(240,246,252,0.07)" strokeWidth={7} />
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth={7} />
       <circle
         cx={cx} cy={cy} r={r} fill="none"
         stroke={color} strokeWidth={7} strokeLinecap="round"
@@ -74,7 +77,7 @@ const sectionHeadingStyle = {
   fontFamily: 'var(--font-heading)',
   fontSize: 'clamp(36px, 4.4vw, 48px)',
   fontWeight: 700,
-  color: 'var(--text-primary)',
+  color: '#1A1A2E',
   letterSpacing: '-0.03em',
   lineHeight: 1.15
 };
@@ -102,7 +105,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
   };
 
   return (
-    <div style={{ background: 'var(--bg-base)', minHeight: '100vh' }}>
+    <div style={{ background: 'transparent', minHeight: '100vh' }}>
 
       {/* ── SECTION 1 — HERO (full-bleed background) ── */}
       <section className="grid-bg" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -120,7 +123,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
             fontFamily: 'var(--font-heading)',
             fontSize: 22,
             fontWeight: 700,
-            color: 'var(--text-primary)',
+            color: '#1A1A2E',
             letterSpacing: '-0.02em'
           }}>
             <span style={{ color: 'var(--accent)' }}>N</span>eighbourScore
@@ -168,6 +171,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                     background: 'var(--accent)', display: 'inline-block',
                     animation: 'pulse-dot 2s ease-in-out infinite'
                   }} />
+                  <Award size={14} color="var(--accent)" strokeWidth={1.5} />
                   Ranked #1 Real Estate tool on Razorpay Fix My Itch · 94.5/100
                 </span>
               </motion.div>
@@ -182,7 +186,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                   lineHeight: 1.08,
                   letterSpacing: '-0.03em',
                   marginBottom: 24,
-                  color: 'var(--text-primary)'
+                  color: '#1A1A2E'
                 }}
               >
                 The credit score<br />
@@ -199,7 +203,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                 variants={fadeUp}
                 style={{
                   fontSize: 17,
-                  color: 'var(--text-secondary)',
+                  color: '#94A3B8',
                   lineHeight: 1.78,
                   marginBottom: 36,
                   maxWidth: 540
@@ -230,29 +234,26 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
 
               {/* Chips */}
               <motion.div variants={fadeUp} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 14 }}>
-                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Try:</span>
+                <span style={{ fontSize: 12, color: '#64748B' }}>Try:</span>
                 {SAMPLE_AREAS.map(area => (
                   <button
                     key={area}
                     onClick={() => handleChipClick(area)}
+                    className="glass-chip"
                     style={{
                       fontSize: 13,
-                      color: 'var(--text-secondary)',
-                      background: 'var(--bg-surface)',
-                      border: '1px solid var(--border-mid)',
                       padding: '6px 15px',
                       borderRadius: 100,
                       cursor: 'pointer',
                       fontFamily: 'var(--font-body)',
-                      transition: 'all 0.15s'
                     }}
                     onMouseEnter={e => {
-                      e.currentTarget.style.borderColor = 'var(--accent-border)';
-                      e.currentTarget.style.color = 'var(--accent)';
+                      e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)';
+                      e.currentTarget.style.color = '#6366F1';
                     }}
                     onMouseLeave={e => {
-                      e.currentTarget.style.borderColor = 'var(--border-mid)';
-                      e.currentTarget.style.color = 'var(--text-secondary)';
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.9)';
+                      e.currentTarget.style.color = '#64748B';
                     }}
                   >
                     {area}
@@ -268,12 +269,8 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.3, ease: 'easeOut' }}
             >
-              <div style={{
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border)',
-                borderRadius: 20,
+              <div className="glass-card" style={{
                 padding: '28px',
-                boxShadow: '0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(230,168,23,0.06)'
               }}>
                 {/* Preview header */}
                 <div style={{
@@ -284,11 +281,11 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                   paddingBottom: 18,
                   borderBottom: '1px solid var(--border)'
                 }}>
-                  <span style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                  <span style={{ fontSize: 10, color: '#64748B', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                     Sample report
                   </span>
                   <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'var(--text-muted)', display: 'inline-block' }} />
-                  <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 500 }}>Baner, Pune</span>
+                  <span style={{ fontSize: 12, color: '#94A3B8', fontWeight: 500 }}>Baner, Pune</span>
                 </div>
 
                 {/* Score row */}
@@ -297,7 +294,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                   <div>
                     <div style={{
                       fontSize: 10,
-                      color: 'var(--text-muted)',
+                      color: '#64748B',
                       marginBottom: 2,
                       letterSpacing: '0.04em',
                       textTransform: 'uppercase'
@@ -312,7 +309,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                       lineHeight: 1
                     }}>
                       81
-                      <span style={{ fontSize: 18, fontWeight: 400, color: 'var(--text-muted)' }}>/100</span>
+                      <span style={{ fontSize: 18, fontWeight: 400, color: '#64748B' }}>/100</span>
                     </div>
                     <div style={{
                       display: 'inline-block',
@@ -340,7 +337,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                         alignItems: 'center',
                         marginBottom: 6
                       }}>
-                        <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                        <span style={{ fontSize: 12, color: '#94A3B8' }}>
                           {emoji} {label}
                         </span>
                         <span style={{
@@ -353,7 +350,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                       </div>
                       <div style={{
                         height: 5,
-                        background: 'rgba(240,246,252,0.06)',
+                        background: 'rgba(0,0,0,0.06)',
                         borderRadius: 3,
                         overflow: 'hidden'
                       }}>
@@ -387,7 +384,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
       </section>
 
       {/* ── SECTION 2 — PROBLEM WE SOLVE ── */}
-      <section style={{ background: '#0A0E14', padding: '112px 0', borderTop: '1px solid var(--border)' }}>
+      <section style={{ background: 'transparent', padding: '112px 0', borderTop: '1px solid var(--border)' }}>
         <div className="section-inner">
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
             <motion.div {...inView}>
@@ -401,17 +398,17 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
           <div className="problem-grid">
             {[
               {
-                Icon: AlertCircle,
+                Icon: Wind,
                 title: 'Air quality? Check a separate website.',
                 body: 'CPCB publishes hourly AQI data for 800+ monitoring stations across India. No housing platform has ever integrated this into a locality decision. Until now.'
               },
               {
-                Icon: BookOpen,
+                Icon: GraduationCap,
                 title: 'Schools? Look them up one by one.',
                 body: '20,367 CBSE-affiliated schools are publicly registered with board results. No platform tells you which are within 3km of your future home — until now.'
               },
               {
-                Icon: Droplets,
+                Icon: Waves,
                 title: 'Flood risk? Nobody tells you.',
                 body: 'NDMA publishes flood hazard zone shapefiles for every district. Developers never mention them. NeighbourScore surfaces this data automatically for every search.'
               }
@@ -422,10 +419,8 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.55, delay: i * 0.1 }}
+                className="glass-card"
                 style={{
-                  background: 'var(--bg-surface)',
-                  border: '1px solid rgba(240,246,252,0.08)',
-                  borderRadius: 16,
                   padding: '32px'
                 }}
               >
@@ -433,26 +428,25 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                   width: 48,
                   height: 48,
                   borderRadius: 12,
-                  background: 'var(--accent-soft)',
-                  border: '1px solid var(--accent-border)',
+                  background: 'rgba(99,102,241,0.08)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: 22
                 }}>
-                  <Icon size={22} color="var(--accent)" />
+                  <Icon size={24} color="#6366F1" strokeWidth={1.5} />
                 </div>
                 <h3 style={{
                   fontSize: 20,
                   fontWeight: 700,
-                  color: 'var(--text-primary)',
+                  color: '#1A1A2E',
                   marginBottom: 12,
                   lineHeight: 1.35,
                   letterSpacing: '-0.01em'
                 }}>
                   {title}
                 </h3>
-                <p style={{ fontSize: 15, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+                <p style={{ fontSize: 15, color: '#94A3B8', lineHeight: 1.7 }}>
                   {body}
                 </p>
               </motion.div>
@@ -462,7 +456,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
       </section>
 
       {/* ── SECTION 3 — HOW IT WORKS ── */}
-      <section style={{ background: 'var(--bg-base)', padding: '112px 0', borderTop: '1px solid var(--border)' }}>
+      <section style={{ background: 'transparent', padding: '112px 0', borderTop: '1px solid var(--border)' }}>
         <div className="section-inner">
           <div style={{ textAlign: 'center', marginBottom: 72 }}>
             <motion.div {...inView}>
@@ -478,19 +472,22 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
             {
               num: '01',
               title: 'Search any locality in Pune',
-              body: 'Type a locality name or housing society. Google Maps autocomplete finds the exact coordinates instantly — no manual entry needed.'
+              body: 'Type a locality name or housing society. Google Maps autocomplete finds the exact coordinates instantly — no manual entry needed.',
+              Icon: MapPin
             },
             {
               num: '02',
               title: 'We fetch data from 8 government sources',
-              body: 'CPCB air quality, CBSE school results, NDMA flood maps, NCRB crime data, Google Maps — all queried in parallel in under 3 seconds.'
+              body: 'CPCB air quality, CBSE school results, NDMA flood maps, NCRB crime data, Google Maps — all queried in parallel in under 3 seconds.',
+              Icon: Database
             },
             {
               num: '03',
               title: 'Get your NeighbourScore report card',
-              body: 'An overall score out of 100, 8 dimension scores with progress bars, and Gemini-powered plain English explanations for each dimension.'
+              body: 'An overall score out of 100, 8 dimension scores with progress bars, and Gemini-powered plain English explanations for each dimension.',
+              Icon: BarChart3
             }
-          ].map(({ num, title, body }, i) => (
+          ].map(({ num, title, body, Icon }, i) => (
             <motion.div
               key={num}
               initial={{ opacity: 0, y: 28 }}
@@ -503,7 +500,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                 fontSize: 72,
                 fontWeight: 800,
                 fontFamily: 'var(--font-heading)',
-                color: 'var(--text-hint)',
+                color: 'rgba(26,26,46,0.3)',
                 lineHeight: 1,
                 marginBottom: 24,
                 letterSpacing: '-0.04em'
@@ -513,14 +510,17 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
               <h3 style={{
                 fontSize: 18,
                 fontWeight: 700,
-                color: 'var(--text-primary)',
-                marginBottom: 12,
+                color: '#1A1A2E',
+                marginBottom: 6,
                 lineHeight: 1.3,
                 letterSpacing: '-0.015em'
               }}>
                 {title}
               </h3>
-              <p style={{ fontSize: 15, color: 'var(--text-secondary)', lineHeight: 1.72 }}>
+              <div style={{ marginBottom: 12 }}>
+                <Icon size={20} color="#6366F1" strokeWidth={1.5} />
+              </div>
+              <p style={{ fontSize: 15, color: '#94A3B8', lineHeight: 1.72 }}>
                 {body}
               </p>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 20 }}>
@@ -534,7 +534,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
       </section>
 
       {/* ── SECTION 4 — DATA SOURCES ── */}
-      <section style={{ background: '#0A0E14', padding: '112px 0', borderTop: '1px solid var(--border)' }}>
+      <section style={{ background: 'transparent', padding: '112px 0', borderTop: '1px solid var(--border)' }}>
         <div className="section-inner">
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
             <motion.div {...inView}>
@@ -542,7 +542,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
               <h2 style={{ ...sectionHeadingStyle, marginBottom: 14 }}>
                 Built on verified government data. Not opinions.
               </h2>
-              <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 620, margin: '0 auto', lineHeight: 1.7 }}>
+              <p style={{ fontSize: 16, color: '#94A3B8', maxWidth: 620, margin: '0 auto', lineHeight: 1.7 }}>
                 Every score is computed from primary sources — the same data that researchers and policymakers use.
               </p>
             </motion.div>
@@ -552,10 +552,10 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
           {[
             { Icon: Wind, name: 'CPCB', sub: 'Live AQI · Updated hourly', detail: 'Central Pollution Control Board' },
             { Icon: GraduationCap, name: 'CBSE', sub: '20,367 schools · Board results', detail: 'Central Board of Secondary Education' },
-            { Icon: Waves, name: 'NDMA', sub: 'Flood hazard zones · Shapefile data', detail: 'National Disaster Management Authority' },
+            { Icon: AlertTriangle, name: 'NDMA', sub: 'Flood hazard zones · Shapefile data', detail: 'National Disaster Management Authority' },
             { Icon: Shield, name: 'NCRB', sub: 'Crime in India 2023 · District level', detail: 'National Crime Records Bureau' },
             { Icon: Map, name: 'Google Maps', sub: 'Places API · Hospitals & Transport', detail: 'Google Maps Platform' },
-            { Icon: Database, name: 'OpenStreetMap', sub: 'Parks & greenery data', detail: 'Open source geospatial data' },
+            { Icon: Trees, name: 'OpenStreetMap', sub: 'Parks & greenery data', detail: 'Open source geospatial data' },
           ].map(({ Icon, name, sub, detail }, i) => (
             <motion.div
               key={name}
@@ -563,29 +563,26 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.45, delay: i * 0.07 }}
+              className="glass-card"
               style={{
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border)',
-                borderRadius: 14,
                 padding: '28px'
               }}
             >
               <div style={{
-                width: 44,
-                height: 44,
-                borderRadius: 11,
-                background: 'var(--accent-soft)',
-                border: '1px solid var(--accent-border)',
+                width: 40,
+                height: 40,
+                borderRadius: 8,
+                background: 'rgba(99,102,241,0.08)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: 18
               }}>
-                <Icon size={20} color="var(--accent)" />
+                <Icon size={20} color="#6366F1" strokeWidth={1.5} />
               </div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{name}</div>
-              <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 8, fontWeight: 500 }}>{sub}</div>
-              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{detail}</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: '#1A1A2E', marginBottom: 4 }}>{name}</div>
+              <div style={{ fontSize: 13, color: '#94A3B8', marginBottom: 8, fontWeight: 500 }}>{sub}</div>
+              <div style={{ fontSize: 12, color: '#64748B' }}>{detail}</div>
             </motion.div>
           ))}
           </div>
@@ -593,17 +590,20 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
       </section>
 
       {/* ── SECTION 5 — FINAL CTA ── */}
-      <section style={{ background: 'var(--bg-base)', padding: '112px 0', borderTop: '1px solid var(--border)' }}>
+      <section style={{ background: 'transparent', padding: '112px 0', borderTop: '1px solid var(--border)' }}>
         <motion.div {...inView}>
           <div className="section-inner">
           {/* Stats strip — enormous amber numbers spread across full width */}
           <div className="stats-strip">
             {[
-              { num: '8', label: 'Data dimensions' },
-              { num: '94.5', label: 'Razorpay Fix My Itch score' },
-              { num: '50,000+', label: 'Indians validated this' },
-            ].map(({ num, label }) => (
+              { num: '8', label: 'Data dimensions', Icon: LayoutGrid },
+              { num: '94.5', label: 'Razorpay Fix My Itch score', Icon: Star },
+              { num: '50,000+', label: 'Indians validated this', Icon: Users },
+            ].map(({ num, label, Icon }) => (
               <div key={label} style={{ textAlign: 'center' }}>
+                <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
+                  <Icon size={28} color="#6366F1" strokeWidth={1.5} />
+                </div>
                 <div style={{
                   fontSize: 'clamp(56px, 7vw, 80px)',
                   fontWeight: 800,
@@ -614,7 +614,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                 }}>
                   {num}
                 </div>
-                <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 12, letterSpacing: '0.02em' }}>{label}</div>
+                <div style={{ fontSize: 14, color: '#94A3B8', marginTop: 12, letterSpacing: '0.02em' }}>{label}</div>
               </div>
             ))}
           </div>
@@ -624,14 +624,14 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
               fontFamily: 'var(--font-heading)',
               fontSize: 'clamp(36px, 5vw, 60px)',
               fontWeight: 700,
-              color: 'var(--text-primary)',
+              color: '#1A1A2E',
               letterSpacing: '-0.03em',
               marginBottom: 18,
               lineHeight: 1.1
             }}>
               Know before you move.
             </h2>
-            <p style={{ fontSize: 17, color: 'var(--text-secondary)', marginBottom: 40, lineHeight: 1.7 }}>
+            <p style={{ fontSize: 17, color: '#94A3B8', marginBottom: 40, lineHeight: 1.7 }}>
               Join thousands of Indian families making data-backed housing decisions.
             </p>
 
@@ -641,7 +641,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: 22, flexWrap: 'wrap' }}>
               {['Free', 'No signup required', 'Pune only for now'].map(t => (
-                <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)' }}>
+                <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#94A3B8' }}>
                   <CheckCircle size={13} color="var(--text-muted)" /> {t}
                 </span>
               ))}
@@ -649,8 +649,16 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
 
             {/* Footer */}
             <div style={{ marginTop: 80, paddingTop: 36, borderTop: '1px solid var(--border)' }}>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                Data sourced from CPCB · CBSE · NDMA · NCRB · Google Maps &nbsp;·&nbsp; NeighbourScore · Google Solution Challenge 2026
+              <p style={{ fontSize: 12, color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
+                <span>Data sourced from</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Wind size={12} strokeWidth={1.5} color="#94A3B8" /> CPCB</span> ·
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><GraduationCap size={12} strokeWidth={1.5} color="#94A3B8" /> CBSE</span> ·
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><AlertTriangle size={12} strokeWidth={1.5} color="#94A3B8" /> NDMA</span> ·
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Shield size={12} strokeWidth={1.5} color="#94A3B8" /> NCRB</span> ·
+                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Map size={12} strokeWidth={1.5} color="#94A3B8" /> Google Maps</span>
+              </p>
+              <p style={{ fontSize: 11, color: 'rgba(26,26,46,0.3)', marginTop: 8 }}>
+                NeighbourScore · Google Solution Challenge 2026
               </p>
             </div>
           </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Share2, ChevronRight } from 'lucide-react';
+import { Search, Share2, ChevronRight } from 'lucide-react';
 
 function Navbar({ onNewSearch, locality }) {
   const parts = locality ? locality.split(',').map(p => p.trim()) : [];
@@ -20,14 +20,11 @@ function Navbar({ onNewSearch, locality }) {
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
+      className="glass-nav"
       style={{
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        background: 'rgba(13,17,23,0.90)',
-        backdropFilter: 'blur(18px)',
-        WebkitBackdropFilter: 'blur(18px)',
-        borderBottom: '1px solid var(--border)',
         padding: '0 32px',
         height: 58,
         display: 'flex',
@@ -40,7 +37,7 @@ function Navbar({ onNewSearch, locality }) {
         fontFamily: 'var(--font-heading)',
         fontSize: 18,
         fontWeight: 700,
-        color: 'var(--text-primary)',
+        color: '#1A1A2E',
         letterSpacing: '-0.02em',
         flexShrink: 0
       }}>
@@ -54,14 +51,14 @@ function Navbar({ onNewSearch, locality }) {
           alignItems: 'center',
           gap: 6,
           fontSize: 13,
-          color: 'var(--text-muted)',
+          color: '#64748B',
           position: 'absolute',
           left: '50%',
           transform: 'translateX(-50%)'
         }}>
           <span>{city}</span>
           <ChevronRight size={12} />
-          <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{area}</span>
+          <span style={{ color: '#94A3B8', fontWeight: 600 }}>{area}</span>
         </div>
       )}
 
@@ -69,17 +66,15 @@ function Navbar({ onNewSearch, locality }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <button
           onClick={handleShare}
+          className="glass-chip"
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             width: 34,
             height: 34,
-            background: 'var(--bg-elevated)',
-            border: '1px solid var(--border)',
-            borderRadius: 8,
             cursor: 'pointer',
-            color: 'var(--text-muted)',
+            color: '#64748B',
             transition: 'all 0.2s'
           }}
           onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.borderColor = 'var(--border-mid)'; }}
@@ -91,17 +86,15 @@ function Navbar({ onNewSearch, locality }) {
 
         <button
           onClick={onNewSearch}
+          className="glass-chip"
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            background: 'var(--bg-elevated)',
-            border: '1px solid var(--border)',
-            color: 'var(--text-secondary)',
+            color: '#94A3B8',
             fontSize: 13,
             fontWeight: 500,
             padding: '7px 14px',
-            borderRadius: 8,
             cursor: 'pointer',
             fontFamily: 'var(--font-body)',
             transition: 'all 0.2s'
@@ -109,7 +102,7 @@ function Navbar({ onNewSearch, locality }) {
           onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.borderColor = 'var(--border-mid)'; }}
           onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
         >
-          <ArrowLeft size={12} />
+          <Search size={14} strokeWidth={1.5} />
           New Search
         </button>
       </div>

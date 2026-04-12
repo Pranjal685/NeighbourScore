@@ -54,7 +54,7 @@ function LoadingScreen({ localityName }) {
         fontFamily: 'var(--font-heading)',
         fontSize: 18,
         fontWeight: 700,
-        color: 'var(--text-primary)'
+        color: '#1A1A2E'
       }}>
         <span style={{ color: 'var(--accent)' }}>N</span>eighbourScore
       </div>
@@ -71,13 +71,13 @@ function LoadingScreen({ localityName }) {
             fontFamily: 'var(--font-heading)',
             fontSize: 22,
             fontWeight: 600,
-            color: 'var(--text-primary)',
+            color: '#1A1A2E',
             letterSpacing: '-0.02em',
             marginBottom: 6
           }}>
             Analyzing {shortName}
           </h2>
-          <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>
+          <p style={{ fontSize: 14, color: '#64748B' }}>
             Fetching data from 8 government sources...
           </p>
         </motion.div>
@@ -87,10 +87,8 @@ function LoadingScreen({ localityName }) {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.18 }}
+          className="glass-card"
           style={{
-            background: 'var(--bg-surface)',
-            border: '1px solid var(--border)',
-            borderRadius: 16,
             overflow: 'hidden',
             marginBottom: 20
           }}
@@ -130,7 +128,7 @@ function LoadingScreen({ localityName }) {
                     <div style={{
                       width: 13,
                       height: 13,
-                      border: '2px solid rgba(240,246,252,0.08)',
+                      border: '2px solid rgba(0,0,0,0.08)',
                       borderTopColor: '#E6A817',
                       borderRadius: '50%',
                       animation: 'spin 0.7s linear infinite'
@@ -179,7 +177,7 @@ function LoadingScreen({ localityName }) {
                       exit={{ opacity: 0 }}
                       style={{
                         fontSize: 12,
-                        color: 'var(--text-muted)',
+                        color: '#64748B',
                         whiteSpace: 'nowrap',
                         flexShrink: 0
                       }}
@@ -231,7 +229,7 @@ function LoadingScreen({ localityName }) {
         {/* Footer */}
         <p style={{
           fontSize: 11,
-          color: 'var(--text-muted)',
+          color: '#64748B',
           textAlign: 'center',
           marginTop: 20,
           lineHeight: 1.5

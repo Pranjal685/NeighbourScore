@@ -1,5 +1,5 @@
-import React from 'react';
 import { Tier1Card, Tier2Card, Tier3Card } from './DimensionCard';
+import { TrendingUp, BarChart2, Info } from 'lucide-react';
 
 // Tier 1 — highest weight + most important for family decision
 const TIER1 = ['school_quality', 'air_quality', 'flood_risk'];
@@ -19,7 +19,7 @@ const NAMES = {
   greenery:       'Greenery & Parks',
 };
 
-function SectionLabel({ children }) {
+function SectionLabel({ children, Icon, style }) {
   return (
     <div style={{
       fontSize: 12,
@@ -28,8 +28,13 @@ function SectionLabel({ children }) {
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
       marginBottom: 16,
-      marginTop: 8
+      marginTop: 8,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 6,
+      ...style
     }}>
+      {Icon && <Icon size={14} color="var(--accent)" strokeWidth={1.5} />}
       {children}
     </div>
   );
@@ -41,7 +46,7 @@ function DimensionGrid({ dimensions }) {
   return (
     <div>
       {/* TIER 1 */}
-      <SectionLabel>Core Dimensions — Highest Impact</SectionLabel>
+      <SectionLabel Icon={TrendingUp}>Core Dimensions — Highest Impact</SectionLabel>
       <div className="tier1-grid">
         {TIER1.map((key, i) => {
           const d = get(key);
@@ -61,7 +66,7 @@ function DimensionGrid({ dimensions }) {
       </div>
 
       {/* TIER 2 */}
-      <SectionLabel style={{ marginTop: 24 }}>Supporting Dimensions</SectionLabel>
+      <SectionLabel style={{ marginTop: 24 }} Icon={BarChart2}>Supporting Dimensions</SectionLabel>
       <div className="tier2-grid">
         {TIER2.map((key, i) => {
           const d = get(key);
@@ -81,7 +86,7 @@ function DimensionGrid({ dimensions }) {
       </div>
 
       {/* TIER 3 */}
-      <SectionLabel style={{ marginTop: 24 }}>Contextual Indicators</SectionLabel>
+      <SectionLabel style={{ marginTop: 24 }} Icon={Info}>Contextual Indicators</SectionLabel>
       <div className="tier3-grid">
         {TIER3.map((key, i) => {
           const d = get(key);

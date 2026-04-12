@@ -1,24 +1,25 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { getScoreColor } from './DimensionCard';
+import { Navigation, ArrowUpRight } from 'lucide-react';
 
 function NearbyAlternatives({ alternatives, onSearch }) {
   if (!alternatives || alternatives.length === 0) return null;
 
   return (
-    <div style={{
-      background: 'var(--bg-card, #161B22)',
-      border: '1px solid rgba(255,255,255,0.08)',
+    <div 
+      className="glass-card"
+      style={{
       borderRadius: 16,
       padding: 24,
       marginTop: 32,
     }}>
       {/* Header */}
       <div>
-        <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
-          📍 Better Alternatives Nearby
+        <div style={{ fontSize: 16, fontWeight: 600, color: '#1A1A2E', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Navigation size={18} color="#6366F1" strokeWidth={1.5} /> Better Alternatives Nearby
         </div>
-        <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
+        <div style={{ fontSize: 13, color: '#64748B', marginTop: 4 }}>
           Areas within reach with higher NeighbourScores
         </div>
       </div>
@@ -38,11 +39,10 @@ function NearbyAlternatives({ alternatives, onSearch }) {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.35, delay: i * 0.1 }}
-              whileHover={{ y: -2, borderColor: 'rgba(255,255,255,0.18)' }}
+              whileHover={{ y: -2, borderColor: 'rgba(0,0,0,0.1)' }}
               onClick={() => onSearch && onSearch(alt.name + ', Pune')}
+              className="glass-card"
               style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.06)',
                 borderRadius: 12,
                 padding: '16px 20px',
                 flex: '1 1 160px',
@@ -52,7 +52,7 @@ function NearbyAlternatives({ alternatives, onSearch }) {
               }}
             >
               {/* Area name */}
-              <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 8 }}>
+              <div style={{ fontSize: 15, fontWeight: 600, color: '#1A1A2E', marginBottom: 8 }}>
                 {alt.name}
               </div>
 
@@ -68,30 +68,32 @@ function NearbyAlternatives({ alternatives, onSearch }) {
                 }}>
                   {alt.score}
                 </span>
-                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>/ 100</span>
+                <span style={{ fontSize: 13, color: '#64748B' }}>/ 100</span>
               </div>
 
               {/* Distance */}
-              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>
+              <div style={{ fontSize: 12, color: '#64748B', marginBottom: 8 }}>
                 ~{alt.distance_km} km away
               </div>
 
-              {/* Improvement pill */}
-              <div style={{
-                display: 'inline-block',
-                background: 'rgba(63,185,80,0.1)',
-                color: '#3FB950',
-                fontSize: 11,
-                fontWeight: 600,
-                padding: '2px 8px',
-                borderRadius: 100,
-                marginBottom: 10,
-              }}>
-                +{alt.improvement} vs current area
+              {/* Improvement pill & Arrow */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <div style={{
+                  display: 'inline-block',
+                  background: 'rgba(63,185,80,0.1)',
+                  color: '#3FB950',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  padding: '2px 8px',
+                  borderRadius: 100,
+                }}>
+                  +{alt.improvement} vs current area
+                </div>
+                <ArrowUpRight size={14} color="#64748B" strokeWidth={1.5} />
               </div>
 
               {/* CTA */}
-              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              <div style={{ fontSize: 11, color: '#64748B' }}>
                 Click to analyze →
               </div>
             </motion.div>

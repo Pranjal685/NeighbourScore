@@ -1,20 +1,15 @@
 import React from 'react';
 import { GoogleMap, MarkerF } from '@react-google-maps/api';
 
-const darkMapStyles = [
-  { elementType: 'geometry', stylers: [{ color: '#0D1117' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#0D1117' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#3d5070' }] },
-  { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#4a607a' }] },
-  { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#3a5060' }] },
-  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#081522' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#0d1e35' }] },
-  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#0D1117' }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#112038' }] },
-  { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#0D1117' }] },
-  { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#0a1828' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#030d1c' }] },
-  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#1a2f4a' }] }
+const lightMapStyles = [
+  { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#f5f5f5" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#dadada" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#c9e8f5" }] },
+  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#d5e8d4" }] },
+  { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }
 ];
 
 function MapView({ lat, lng, height = 360 }) {
@@ -29,7 +24,7 @@ function MapView({ lat, lng, height = 360 }) {
         center={{ lat, lng }}
         zoom={14}
         options={{
-          styles: darkMapStyles,
+          styles: lightMapStyles,
           disableDefaultUI: true,
           zoomControl: true,
           zoomControlOptions: { position: 9 }
