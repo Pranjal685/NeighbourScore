@@ -161,6 +161,7 @@ router.post('/', async (req, res) => {
   try {
     const { lat, lng, locality_name, profile } = req.body;
 
+    // Validate lat and lng exist
     if (lat == null || lng == null) {
       return res.status(400).json({ error: 'lat and lng are required' });
     }
@@ -172,8 +173,25 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'lat and lng must be valid numbers' });
     }
 
-    const name = locality_name || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-    const response = await runScoringPipeline(latitude, longitude, name, profile || 'general');
+    // Validate India bounding box
+    if (latitude < 6.5 || latitude > 37.5 || longitude < 68.0 || longitude > 97.5) {
+      return res.status(400).json({
+        error: 'Coordinates must be within India bounding box',
+      });
+    }
+
+    // Sanitize locality_name — strip HTML tags and injection characters, cap at 100 chars
+    const sanitizedLocality = String(locality_name || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`)
+      .replace(/<[^>]*>/g, '')    // strip HTML tags
+      .replace(/['"`;]/g, '')     // strip injection chars
+      .trim()
+      .substring(0, 100);
+
+    // Validate profile — unknown profiles fall back to general
+    const validProfiles = ['general', 'family', 'professional', 'retiree', 'investor'];
+    const sanitizedProfile = validProfiles.includes(profile) ? profile : 'general';
+
+    const response = await runScoringPipeline(latitude, longitude, sanitizedLocality, sanitizedProfile);
     res.json(response);
   } catch (err) {
     console.error('Score endpoint error:', err);

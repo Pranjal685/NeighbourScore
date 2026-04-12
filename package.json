@@ -1,0 +1,26 @@
+{
+  "name": "neighbourscore-tests",
+  "version": "1.0.0",
+  "description": "Test suite for NeighbourScore backend",
+  "scripts": {
+    "test": "jest --testTimeout=30000 --forceExit --runInBand",
+    "test:stress": "jest tests/stress.test.js --testTimeout=60000 --forceExit",
+    "test:scoring": "jest tests/scoring.test.js --testTimeout=30000 --forceExit",
+    "test:security": "jest tests/security.test.js --testTimeout=30000 --forceExit"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "axios": "^1.15.0",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.3.2",
+    "jest": "^30.3.0"
+  }
+}
