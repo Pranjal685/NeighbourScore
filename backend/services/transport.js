@@ -37,8 +37,42 @@ function getFallbackScore(lat, lng, localityName) {
 }
 
 /**
- * Count bus stations within 500m using Google Maps Places Nearby Search.
- * Falls back to locality-based scoring if API is unavailable.
+ * Attempt a Places Nearby Search and return results array, or null on failure.
+ * Logs the URL, status, and result count for debugging.
+ */
+async function tryNearbySearch(lat, lng, apiKey, params, label) {
+  const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+  const fullParams = { location: `${lat},${lng}`, radius: 1000, key: apiKey, ...params };
+  console.log(`[Transport] ${label} URL: ${url} params: ${JSON.stringify({ ...fullParams, key: '***' })}`);
+  const { data } = await axios.get(url, { params: fullParams, timeout: 10000 });
+  console.log(`[Transport] ${label} status=${data.status} count=${(data.results || []).length}`);
+  if (data.status === 'OK' && (data.results || []).length > 0) {
+    return data.results;
+  }
+  return null;
+}
+
+/**
+ * Attempt a Places Text Search and return results array, or null on failure.
+ */
+async function tryTextSearch(lat, lng, apiKey, query, label) {
+  const url = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
+  const params = { query: `${query} near ${lat},${lng}`, key: apiKey };
+  console.log(`[Transport] ${label} URL: ${url} params: ${JSON.stringify({ ...params, key: '***' })}`);
+  const { data } = await axios.get(url, { params, timeout: 10000 });
+  console.log(`[Transport] ${label} status=${data.status} count=${(data.results || []).length}`);
+  if (data.status === 'OK' && (data.results || []).length > 0) {
+    return data.results;
+  }
+  return null;
+}
+
+/**
+ * Count bus/transit stops within 1km using Google Maps Places API.
+ * Cascades through three strategies before falling back to locality scoring:
+ *   1. Nearby Search — type=transit_station
+ *   2. Nearby Search — keyword="bus stop PMPML"
+ *   3. Text Search   — query="PMPML bus stop near <lat,lng>"
  */
 async function getTransportScore(lat, lng, localityName) {
   try {
@@ -47,29 +81,27 @@ async function getTransportScore(lat, lng, localityName) {
       return getFallbackScore(lat, lng, localityName);
     }
 
-    const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
-    const { data } = await axios.get(url, {
-      params: {
-        location: `${lat},${lng}`,
-        radius: 500,
-        type: 'bus_station',
-        key: apiKey,
-      },
-      timeout: 10000,
-    });
+    let results = null;
 
-    // If API returns non-OK or ZERO_RESULTS, use locality fallback
-    // ZERO_RESULTS for bus_station is unreliable — Places API often misses PMPML stops
-    if (data.status !== 'OK') {
+    // Strategy 1: transit_station (catches metro, BRT, and bus terminals)
+    results = await tryNearbySearch(lat, lng, apiKey, { type: 'transit_station' }, 'S1:transit_station');
+
+    // Strategy 2: keyword search for PMPML bus stops
+    if (!results) {
+      results = await tryNearbySearch(lat, lng, apiKey, { keyword: 'bus stop PMPML' }, 'S2:keyword=bus_stop_PMPML');
+    }
+
+    // Strategy 3: text search as last resort
+    if (!results) {
+      results = await tryTextSearch(lat, lng, apiKey, 'PMPML bus stop', 'S3:textsearch');
+    }
+
+    if (!results) {
+      console.log('[Transport] All 3 strategies returned no results — using fallback');
       return getFallbackScore(lat, lng, localityName);
     }
 
-    const results = data.results || [];
     const count = results.length;
-    // If API returns suspiciously low count (≤1), blend with fallback
-    if (count <= 1) {
-      return getFallbackScore(lat, lng, localityName);
-    }
     const score = Math.min(100, Math.max(0, count * 15));
 
     return {
@@ -84,6 +116,7 @@ async function getTransportScore(lat, lng, localityName) {
       },
     };
   } catch (err) {
+    console.error('[Transport] Error:', err.message);
     return getFallbackScore(lat, lng, localityName);
   }
 }
