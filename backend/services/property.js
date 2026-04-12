@@ -1,5 +1,7 @@
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
 /**
- * Hardcoded Pune locality property price map for demo.
+ * Hardcoded Pune locality property price map — used as fallback.
  */
 const PUNE_LOCALITIES = {
   'wakad':            { price_per_sqft: 8200,  trend_12m_pct: 8  },
@@ -28,15 +30,77 @@ function trendToScore(trend) {
 }
 
 /**
- * Match locality name against the hardcoded price map.
+ * Try to get live property data from Gemini with Google Search grounding.
+ * Returns null if it fails or returns invalid data.
+ */
+async function tryGeminiSearch(localityName) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-flash',
+      tools: [{ googleSearch: {} }],
+    });
+
+    const prompt = `What is the current property price per square foot in ${localityName} in 2026? Give me the average price in INR per sqft and the approximate 12-month price appreciation percentage. Respond ONLY in this JSON format with no other text: {"price_per_sqft": number, "trend_12m_pct": number, "source": "string"}`;
+
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    });
+
+    const text = result.response.text();
+
+    // Extract JSON from the response
+    const jsonStart = text.indexOf('{');
+    const jsonEnd = text.lastIndexOf('}');
+    if (jsonStart === -1 || jsonEnd === -1) return null;
+
+    const jsonStr = text.substring(jsonStart, jsonEnd + 1);
+    const parsed = JSON.parse(jsonStr);
+
+    if (
+      typeof parsed.price_per_sqft === 'number' &&
+      parsed.price_per_sqft > 0 &&
+      typeof parsed.trend_12m_pct === 'number'
+    ) {
+      return parsed;
+    }
+    return null;
+  } catch (err) {
+    console.warn('Gemini search grounding failed for property:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Get property score — tries Gemini search grounding first, falls back to hardcoded map.
  */
 async function getPropertyScore(lat, lng, localityName) {
+  // Step 1: Try Gemini with search grounding
+  const geminiData = await tryGeminiSearch(localityName);
+
+  if (geminiData) {
+    const score = Math.min(100, Math.max(0, trendToScore(geminiData.trend_12m_pct)));
+    return {
+      score,
+      raw: {
+        locality_matched: localityName,
+        price_per_sqft: geminiData.price_per_sqft,
+        trend_12m_pct: geminiData.trend_12m_pct,
+        source: 'gemini_search_2026',
+        data_freshness: 'live',
+      },
+    };
+  }
+
+  // Step 2: Fall back to hardcoded map
   try {
     const search = (localityName || '').toLowerCase();
     let matched = null;
     let matchedKey = null;
 
-    // Check if any key from the map is contained in the locality name
     for (const [key, val] of Object.entries(PUNE_LOCALITIES)) {
       if (search.includes(key)) {
         matched = val;
@@ -46,7 +110,6 @@ async function getPropertyScore(lat, lng, localityName) {
     }
 
     if (!matched) {
-      // Default fallback
       return {
         score: 60,
         raw: {
@@ -54,12 +117,12 @@ async function getPropertyScore(lat, lng, localityName) {
           price_per_sqft: 7500,
           trend_12m_pct: 5,
           source: 'aggregated_2024',
+          data_freshness: 'cached',
         },
       };
     }
 
     const score = Math.min(100, Math.max(0, trendToScore(matched.trend_12m_pct)));
-
     return {
       score,
       raw: {
@@ -67,13 +130,19 @@ async function getPropertyScore(lat, lng, localityName) {
         price_per_sqft: matched.price_per_sqft,
         trend_12m_pct: matched.trend_12m_pct,
         source: 'aggregated_2024',
+        data_freshness: 'cached',
       },
     };
   } catch (err) {
-    // This service should never throw
     return {
       score: 60,
-      raw: { locality_matched: null, price_per_sqft: 7500, trend_12m_pct: 5, source: 'aggregated_2024' },
+      raw: {
+        locality_matched: null,
+        price_per_sqft: 7500,
+        trend_12m_pct: 5,
+        source: 'aggregated_2024',
+        data_freshness: 'cached',
+      },
     };
   }
 }

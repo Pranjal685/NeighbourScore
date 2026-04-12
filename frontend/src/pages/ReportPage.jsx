@@ -7,6 +7,8 @@ import DimensionGrid from '../components/DimensionGrid';
 import NeighbourRadarChart from '../components/RadarChart';
 import MapView from '../components/MapView';
 import CompareMode from '../components/CompareMode';
+import RedFlagAlert from '../components/RedFlagAlert';
+import NearbyAlternatives from '../components/NearbyAlternatives';
 
 const inView = {
   initial: { opacity: 0, y: 30 },
@@ -37,7 +39,7 @@ const PROFILE_META = {
   investor:     { label: 'Investor', icon: '🏠' },
 };
 
-function ReportPage({ result, lat, lng, onNewSearch, profile }) {
+function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
   const [showCompare, setShowCompare] = useState(false);
   const activeProfile = result.profile || profile || 'general';
   const profileMeta = PROFILE_META[activeProfile] || null;
@@ -46,6 +48,23 @@ function ReportPage({ result, lat, lng, onNewSearch, profile }) {
   const scoreLabel = getScoreLabel(composite);
   const localityShort = (result.locality || '').split(',')[0].trim();
   const timestamp = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  // Geocode a locality name and trigger a new search
+  const handleAlternativeSearch = async (localityName) => {
+    if (!onSearch) return;
+    try {
+      const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(localityName + ', Pune, India')}&key=${apiKey}`;
+      const res = await fetch(url);
+      const geoData = await res.json();
+      if (geoData.results && geoData.results[0]) {
+        const { lat: gLat, lng: gLng } = geoData.results[0].geometry.location;
+        onSearch(gLat, gLng, localityName, activeProfile);
+      }
+    } catch (err) {
+      console.error('Geocoding failed for alternative search:', err);
+    }
+  };
 
   return (
     <motion.div
@@ -190,7 +209,17 @@ function ReportPage({ result, lat, lng, onNewSearch, profile }) {
         {/* ── PART 2: Dimension Breakdown ── */}
         <motion.div {...inView} style={{ marginBottom: 48 }}>
           <SectionLabel>Dimension Breakdown</SectionLabel>
+
+          {/* Red Flag Alerts — above the grid */}
+          <RedFlagAlert dimensions={result.dimensions} />
+
           <DimensionGrid dimensions={result.dimensions} />
+
+          {/* Nearby Alternatives — below the grid */}
+          <NearbyAlternatives
+            alternatives={result.nearby_alternatives}
+            onSearch={handleAlternativeSearch}
+          />
         </motion.div>
 
         {/* ── PART 3: Map ── */}

@@ -67,6 +67,7 @@ function App() {
             lng={location.lng}
             onNewSearch={handleNewSearch}
             profile={selectedProfile}
+            onSearch={handleSearch}
           />
         )}
       </AnimatePresence>

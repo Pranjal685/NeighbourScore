@@ -1,10 +1,12 @@
 const axios = require('axios');
 const db = require('../firebase');
+const { getCrimeNews } = require('./newsService');
 
 /**
  * Reverse-geocode to find district, then look up crime_data from Firestore.
+ * Also fetches recent news via NewsAPI and attaches to raw data.
  */
-async function getCrimeScore(lat, lng) {
+async function getCrimeScore(lat, lng, localityName) {
   try {
     const apiKey = process.env.GOOGLE_MAPS_API_KEY;
     if (!apiKey) {
@@ -51,7 +53,12 @@ async function getCrimeScore(lat, lng) {
 
     // Step 2: Build slug and query Firestore
     const slug = districtName.toLowerCase().replace(/\s+/g, '_');
-    const doc = await db.collection('crime_data').doc(slug).get();
+
+    // Step 3: Fetch news in parallel with Firestore lookup
+    const [doc, recentNews] = await Promise.all([
+      db.collection('crime_data').doc(slug).get(),
+      getCrimeNews(districtName, localityName || ''),
+    ]);
 
     if (!doc.exists) {
       // Try 'pune' as fallback
@@ -64,11 +71,12 @@ async function getCrimeScore(lat, lng) {
             district: 'Pune',
             crime_rate: fd.crime_rate,
             total_crimes: fd.total_crimes,
+            recent_news: recentNews,
             note: `District '${districtName}' not found, defaulted to Pune`,
           },
         };
       }
-      return { score: 60, raw: { error: true, note: `No crime data for '${slug}'` } };
+      return { score: 60, raw: { error: true, note: `No crime data for '${slug}'`, recent_news: recentNews } };
     }
 
     const crimeData = doc.data();
@@ -79,10 +87,11 @@ async function getCrimeScore(lat, lng) {
         crime_rate: crimeData.crime_rate,
         total_crimes: crimeData.total_crimes,
         population: crimeData.population,
+        recent_news: recentNews,
       },
     };
   } catch (err) {
-    return { score: 60, raw: { error: true, message: err.message } };
+    return { score: 60, raw: { error: true, message: err.message, recent_news: [] } };
   }
 }
 

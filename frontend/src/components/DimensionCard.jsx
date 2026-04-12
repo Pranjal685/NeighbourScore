@@ -1,6 +1,7 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Wind, GraduationCap, Waves, HeartPulse, Shield, Bus, TrendingUp, Leaf } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Wind, GraduationCap, Waves, HeartPulse, Shield, Bus, TrendingUp, Leaf, ChevronDown } from 'lucide-react';
+import EvidenceDrawer from './EvidenceDrawer';
 
 export function getScoreColor(score) {
   if (score === null || score === undefined) return '#484F58';
@@ -45,8 +46,22 @@ function ProgressBar({ score, color, delay = 0 }) {
   );
 }
 
+// ─── Animated Chevron ─────────────────────────────────────────────────────────
+function ExpandChevron({ isExpanded, color }) {
+  return (
+    <motion.div
+      animate={{ rotate: isExpanded ? 180 : 0 }}
+      transition={{ duration: 0.25 }}
+      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+    >
+      <ChevronDown size={14} color={color} style={{ opacity: 0.6 }} />
+    </motion.div>
+  );
+}
+
 // TIER 1 — large card (School, Air, Flood) — full Gemini narrative + big score
 export function Tier1Card({ dimensionKey, name, score, weight, narrative, raw, index }) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const displayScore = (score === null || score === undefined) ? 20 : Math.max(score, 20);
   const color = getScoreColor(displayScore);
   const Icon = ICON_MAP[dimensionKey] || Wind;
@@ -58,6 +73,7 @@ export function Tier1Card({ dimensionKey, name, score, weight, narrative, raw, i
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.08 }}
+      onClick={() => setIsExpanded(!isExpanded)}
       style={{
         background: 'var(--bg-surface)',
         border: '1px solid var(--border)',
@@ -66,7 +82,8 @@ export function Tier1Card({ dimensionKey, name, score, weight, narrative, raw, i
         padding: '22px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 14
+        gap: 14,
+        cursor: 'pointer',
       }}
     >
       {/* Header */}
@@ -84,15 +101,18 @@ export function Tier1Card({ dimensionKey, name, score, weight, narrative, raw, i
             <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>Weight: {weight}</div>
           </div>
         </div>
-        <div style={{
-          fontSize: 36,
-          fontWeight: 800,
-          fontFamily: 'var(--font-heading)',
-          color,
-          lineHeight: 1,
-          letterSpacing: '-0.04em'
-        }}>
-          {displayScore}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{
+            fontSize: 36,
+            fontWeight: 800,
+            fontFamily: 'var(--font-heading)',
+            color,
+            lineHeight: 1,
+            letterSpacing: '-0.04em'
+          }}>
+            {displayScore}
+          </div>
+          <ExpandChevron isExpanded={isExpanded} color={color} />
         </div>
       </div>
 
@@ -121,12 +141,29 @@ export function Tier1Card({ dimensionKey, name, score, weight, narrative, raw, i
       <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7, margin: 0 }}>
         {narrative || 'AI analysis unavailable for this dimension.'}
       </p>
+
+      {/* Evidence Drawer */}
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            key="drawer"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            style={{ overflow: 'hidden' }}
+          >
+            <EvidenceDrawer dimensionKey={dimensionKey} raw={raw} score={displayScore} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
 
 // TIER 2 — medium card (Healthcare, Crime, Transport)
 export function Tier2Card({ dimensionKey, name, score, weight, narrative, raw, index }) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const displayScore = (score === null || score === undefined) ? 20 : Math.max(score, 20);
   const color = getScoreColor(displayScore);
   const Icon = ICON_MAP[dimensionKey] || Wind;
@@ -138,6 +175,7 @@ export function Tier2Card({ dimensionKey, name, score, weight, narrative, raw, i
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.08 }}
+      onClick={() => setIsExpanded(!isExpanded)}
       style={{
         background: 'var(--bg-elevated)',
         border: '1px solid var(--border)',
@@ -146,7 +184,8 @@ export function Tier2Card({ dimensionKey, name, score, weight, narrative, raw, i
         padding: '18px 20px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 10
+        gap: 10,
+        cursor: 'pointer',
       }}
     >
       {/* Header */}
@@ -161,16 +200,19 @@ export function Tier2Card({ dimensionKey, name, score, weight, narrative, raw, i
           </div>
           <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>{name}</span>
         </div>
-        <span style={{
-          fontSize: 28,
-          fontWeight: 800,
-          fontFamily: 'var(--font-heading)',
-          color,
-          lineHeight: 1,
-          letterSpacing: '-0.04em'
-        }}>
-          {displayScore}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{
+            fontSize: 28,
+            fontWeight: 800,
+            fontFamily: 'var(--font-heading)',
+            color,
+            lineHeight: 1,
+            letterSpacing: '-0.04em'
+          }}>
+            {displayScore}
+          </span>
+          <ExpandChevron isExpanded={isExpanded} color={color} />
+        </div>
       </div>
 
       {/* Progress bar */}
@@ -187,12 +229,29 @@ export function Tier2Card({ dimensionKey, name, score, weight, narrative, raw, i
       </p>
 
       <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>Weight: {weight}</div>
+
+      {/* Evidence Drawer */}
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            key="drawer"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            style={{ overflow: 'hidden' }}
+          >
+            <EvidenceDrawer dimensionKey={dimensionKey} raw={raw} score={displayScore} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
 
 // TIER 3 — compact card (Property, Greenery)
 export function Tier3Card({ dimensionKey, name, score, weight, narrative, raw, index }) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const displayScore = (score === null || score === undefined) ? 20 : Math.max(score, 20);
   const color = getScoreColor(displayScore);
   const Icon = ICON_MAP[dimensionKey] || Wind;
@@ -204,6 +263,7 @@ export function Tier3Card({ dimensionKey, name, score, weight, narrative, raw, i
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.45, delay: index * 0.08 }}
+      onClick={() => setIsExpanded(!isExpanded)}
       style={{
         background: 'var(--bg-surface)',
         border: '1px solid var(--border)',
@@ -211,7 +271,8 @@ export function Tier3Card({ dimensionKey, name, score, weight, narrative, raw, i
         padding: '16px 18px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 8
+        gap: 8,
+        cursor: 'pointer',
       }}
     >
       {/* Header */}
@@ -226,16 +287,19 @@ export function Tier3Card({ dimensionKey, name, score, weight, narrative, raw, i
           </div>
           <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)' }}>{name}</span>
         </div>
-        <span style={{
-          fontSize: 24,
-          fontWeight: 800,
-          fontFamily: 'var(--font-heading)',
-          color,
-          lineHeight: 1,
-          letterSpacing: '-0.03em'
-        }}>
-          {displayScore}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{
+            fontSize: 24,
+            fontWeight: 800,
+            fontFamily: 'var(--font-heading)',
+            color,
+            lineHeight: 1,
+            letterSpacing: '-0.03em'
+          }}>
+            {displayScore}
+          </span>
+          <ExpandChevron isExpanded={isExpanded} color={color} />
+        </div>
       </div>
 
       {/* Progress bar */}
@@ -248,6 +312,22 @@ export function Tier3Card({ dimensionKey, name, score, weight, narrative, raw, i
       </p>
 
       <div style={{ fontSize: 10, color: 'var(--text-hint)', textAlign: 'right' }}>Weight: {weight}</div>
+
+      {/* Evidence Drawer */}
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            key="drawer"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            style={{ overflow: 'hidden' }}
+          >
+            <EvidenceDrawer dimensionKey={dimensionKey} raw={raw} score={displayScore} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

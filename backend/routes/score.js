@@ -11,6 +11,7 @@ const { getTransportScore } = require('../services/transport');
 const { getGreeneryScore } = require('../services/greenery');
 const { getPropertyScore } = require('../services/property');
 const { generateNarratives } = require('../services/gemini');
+const { getNearbyAlternatives } = require('../services/alternatives');
 
 // Fallback scores if a service promise is rejected
 const FALLBACK_SCORES = {
@@ -69,7 +70,7 @@ async function runScoringPipeline(lat, lng, locality_name, profile = 'general') 
     getSchoolScore(lat, lng, locality_name),
     getFloodScore(lat, lng),
     getHealthcareScore(lat, lng, locality_name),
-    getCrimeScore(lat, lng),
+    getCrimeScore(lat, lng, locality_name),  // now accepts localityName for news
     getTransportScore(lat, lng, locality_name),
     getGreeneryScore(lat, lng, locality_name),
     getPropertyScore(lat, lng, locality_name),
@@ -114,8 +115,11 @@ async function runScoringPipeline(lat, lng, locality_name, profile = 'general') 
     dimensions.greenery.score       * weights.greenery
   );
 
-  // Generate AI narratives (profile-aware)
-  const narratives = await generateNarratives(dimensions, locality_name, profile);
+  // Generate AI narratives (profile-aware) and nearby alternatives in parallel
+  const [narratives, nearby_alternatives] = await Promise.all([
+    generateNarratives(dimensions, locality_name, profile),
+    getNearbyAlternatives(locality_name, composite),
+  ]);
 
   // Attach narratives to dimensions
   for (const key of Object.keys(dimensions)) {
@@ -132,6 +136,7 @@ async function runScoringPipeline(lat, lng, locality_name, profile = 'general') 
     cached: false,
     timestamp,
     dimensions,
+    nearby_alternatives,
   };
 
   // Cache to Firestore (include profile in cache key so different profiles don't clash)
@@ -197,7 +202,6 @@ router.get('/:locality', async (req, res) => {
     }
 
     // No valid cache — need lat/lng to run fresh pipeline
-    // For GET requests without coordinates, return cached-only or 404
     return res.status(404).json({
       error: 'No cached score found for this locality. Use POST /api/score with lat/lng to generate a new score.',
     });
