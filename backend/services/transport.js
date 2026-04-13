@@ -3,10 +3,12 @@ const axios = require('axios');
 // Fallback locality scores for Pune areas (based on transit connectivity)
 const TRANSPORT_LOCALITY_SCORES = {
   'koregaon park': 88, 'baner': 68, 'aundh': 78, 'kothrud': 75,
-  'wakad': 52, 'hinjewadi': 42, 'viman nagar': 72, 'hadapsar': 65,
+  'wakad': 52, 'hinjewadi': 35, 'viman nagar': 72, 'hadapsar': 65,
   'kharadi': 60, 'pimple saudagar': 58, 'magarpatta': 68,
-  'kalyani nagar': 82, 'dhanori': 38, 'pune': 72, 'pimpri': 68,
-  'chinchwad': 65, 'nibm': 48, 'kondhwa': 45, 'katraj': 42, 'warje': 55,
+  'kalyani nagar': 82, 'dhanori': 38, 'chinchwad': 65, 'nibm': 48,
+  'kondhwa': 45, 'katraj': 42, 'wagholi': 35, 'warje': 55,
+  // Generic entries last — prevents ", Pune" suffix from matching prematurely
+  'pimpri': 68, 'pune': 72,
 };
 
 /**
@@ -102,7 +104,13 @@ async function getTransportScore(lat, lng, localityName) {
     }
 
     const count = results.length;
-    const score = Math.min(100, Math.max(0, count * 15));
+    const fallbackResult = getFallbackScore(lat, lng, localityName);
+    const TARGET = 7; // 7 stops within 1km = full locality-calibrated score
+
+    // Ramp from 50% to 100% of locality-calibrated score as count approaches TARGET.
+    // Above TARGET, cap at calibrated score — extra stop density doesn't inflate.
+    const ratio = count >= TARGET ? 1 : 0.5 + 0.5 * (count / TARGET);
+    const score = Math.min(100, Math.max(0, Math.round(fallbackResult.score * ratio)));
 
     return {
       score,

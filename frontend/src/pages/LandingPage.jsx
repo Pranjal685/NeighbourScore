@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Wind, GraduationCap, Waves, Shield, Map,
-  Trees, TrendingUp, Bus, HeartPulse, BarChart3,
+  Trees, BarChart3,
   MapPin, Database, LayoutGrid, Star, Users,
-  AlertTriangle, Navigation, ArrowUpRight,
-  GitCompare, Search, AlertOctagon, Info,
-  BarChart2, Cpu, Award, ArrowRight, CheckCircle
+  AlertTriangle,
+  Award, ArrowRight, CheckCircle
 } from 'lucide-react';
 import SearchBar from '../components/SearchBar';
 import ProfileSelector from '../components/ProfileSelector';

@@ -5,8 +5,10 @@ const GREENERY_LOCALITY_SCORES = {
   'koregaon park': 95, 'baner': 82, 'aundh': 80, 'kothrud': 72,
   'wakad': 58, 'hinjewadi': 52, 'viman nagar': 68, 'hadapsar': 55,
   'kharadi': 60, 'pimple saudagar': 62, 'magarpatta': 78,
-  'kalyani nagar': 80, 'dhanori': 40, 'pune': 62, 'pimpri': 52,
-  'chinchwad': 50, 'nibm': 55, 'kondhwa': 50, 'katraj': 45, 'warje': 58,
+  'kalyani nagar': 80, 'dhanori': 40, 'chinchwad': 50, 'nibm': 55,
+  'kondhwa': 50, 'katraj': 45, 'wagholi': 38, 'warje': 58,
+  // Generic entries last — prevents ", Pune" suffix from matching prematurely
+  'pimpri': 52, 'pune': 62,
 };
 
 /**
@@ -65,7 +67,13 @@ async function getGreeneryScore(lat, lng, localityName) {
 
     const results = data.results || [];
     const count = results.length;
-    const score = Math.min(100, Math.max(0, count * 20));
+    const fallbackResult = getFallbackScore(lat, lng, localityName);
+    const TARGET = 5; // 5 parks within 1km = full locality-calibrated score
+
+    // Ramp from 50% to 100% of locality-calibrated score as count approaches TARGET.
+    // Above TARGET, cap at calibrated score — extra park density doesn't inflate.
+    const ratio = count >= TARGET ? 1 : 0.5 + 0.5 * (count / TARGET);
+    const score = Math.min(100, Math.max(0, Math.round(fallbackResult.score * ratio)));
 
     return {
       score,

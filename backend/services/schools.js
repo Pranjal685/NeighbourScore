@@ -4,11 +4,13 @@ const ngeohash = require('ngeohash');
 // Locality-based school score fallbacks (CBSE school density per area)
 // Used when geohash returns sparse results (likely incomplete Firestore data)
 const SCHOOL_LOCALITY_SCORES = {
-  'koregaon park': 75, 'baner': 70, 'aundh': 78, 'kothrud': 72,
-  'wakad': 60, 'hinjewadi': 50, 'viman nagar': 68, 'hadapsar': 58,
-  'kharadi': 62, 'pimple saudagar': 58, 'magarpatta': 65,
-  'kalyani nagar': 72, 'dhanori': 35, 'pune': 65, 'pimpri': 55,
-  'chinchwad': 52, 'nibm': 48, 'kondhwa': 45, 'katraj': 42, 'warje': 50,
+  'koregaon park': 75, 'baner': 70, 'aundh': 78, 'kothrud': 68,
+  'wakad': 60, 'hinjewadi': 44, 'viman nagar': 68, 'hadapsar': 58,
+  'kharadi': 62, 'pimple saudagar': 58, 'magarpatta': 52,
+  'kalyani nagar': 82, 'dhanori': 35, 'chinchwad': 52, 'nibm': 48,
+  'kondhwa': 45, 'katraj': 42, 'wagholi': 40, 'warje': 50,
+  // Generic entries last — prevents ", Pune" suffix from matching prematurely
+  'pimpri': 55, 'pune': 65,
 };
 
 /**
@@ -63,14 +65,20 @@ async function getSchoolScore(lat, lng, localityName) {
     const count = nearbySchools.length;
     let score = Math.min(100, Math.max(0, count * 10));
 
-    // If geohash returned sparse results (likely incomplete Firestore data),
-    // use locality-based fallback as a minimum floor
-    if (count < 5 && localityName) {
+    if (localityName) {
       const search = localityName.toLowerCase();
       for (const [key, fallbackScore] of Object.entries(SCHOOL_LOCALITY_SCORES)) {
         if (search.includes(key)) {
-          score = Math.max(score, fallbackScore);
-          console.log(`[Schools] Using locality fallback for '${key}': ${fallbackScore}`);
+          if (count < 5) {
+            // Sparse geohash results — use calibrated fallback as minimum floor
+            score = Math.max(score, fallbackScore);
+            console.log(`[Schools] Sparse results — using locality fallback for '${key}': ${fallbackScore}`);
+          } else {
+            // Many schools found — blend 50/50 to prevent IT-zone inflation
+            // (geohash can pick up schools from neighbouring residential pockets)
+            score = Math.round((score + fallbackScore) / 2);
+            console.log(`[Schools] Blending geohash(${score * 2 - fallbackScore}) + fallback(${fallbackScore}) → ${score}`);
+          }
           break;
         }
       }

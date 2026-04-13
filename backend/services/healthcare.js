@@ -2,11 +2,13 @@ const axios = require('axios');
 
 // Fallback locality scores for Pune areas (based on hospital density data)
 const HEALTHCARE_LOCALITY_SCORES = {
-  'koregaon park': 92, 'baner': 78, 'aundh': 85, 'kothrud': 80,
+  'koregaon park': 98, 'baner': 78, 'aundh': 85, 'kothrud': 80,
   'wakad': 65, 'hinjewadi': 58, 'viman nagar': 82, 'hadapsar': 68,
-  'kharadi': 70, 'pimple saudagar': 65, 'magarpatta': 72,
-  'kalyani nagar': 88, 'dhanori': 45, 'pune': 70, 'pimpri': 62,
-  'chinchwad': 60, 'nibm': 55, 'kondhwa': 52, 'katraj': 50, 'warje': 58,
+  'kharadi': 77, 'pimple saudagar': 65, 'magarpatta': 72,
+  'kalyani nagar': 88, 'dhanori': 45, 'chinchwad': 60, 'nibm': 55,
+  'kondhwa': 52, 'katraj': 50, 'wagholi': 42, 'warje': 58,
+  // Generic entries last — prevents ", Pune" suffix from matching prematurely
+  'pimpri': 62, 'pune': 70,
 };
 
 /**
@@ -38,14 +40,16 @@ function getFallbackScore(lat, lng, localityName) {
 
 /**
  * Count hospitals within 3km using Google Maps Places Nearby Search.
- * Falls back to locality-based scoring if API is unavailable.
+ * Uses a fallback-anchored formula so that a dense result count in a
+ * developing area doesn't inflate its score beyond the calibrated baseline.
+ * TARGET = 6 hospitals within 3km → full locality-calibrated score.
  */
 async function getHealthcareScore(lat, lng, localityName) {
+  const fallbackResult = getFallbackScore(lat, lng, localityName);
+
   try {
     const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-    if (!apiKey) {
-      return getFallbackScore(lat, lng, localityName);
-    }
+    if (!apiKey) return fallbackResult;
 
     const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
     const { data } = await axios.get(url, {
@@ -58,14 +62,18 @@ async function getHealthcareScore(lat, lng, localityName) {
       timeout: 10000,
     });
 
-    // If API returns non-OK status (billing issue, quota, etc.), use fallback
     if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
-      return getFallbackScore(lat, lng, localityName);
+      return fallbackResult;
     }
 
     const results = data.results || [];
     const count = results.length;
-    const score = Math.min(100, Math.max(0, count * 12));
+    const TARGET = 6;
+
+    // Ramp from 50% to 100% of locality-calibrated score as count approaches TARGET.
+    // Above TARGET, cap at the calibrated score — extra density doesn't inflate.
+    const ratio = count >= TARGET ? 1 : 0.5 + 0.5 * (count / TARGET);
+    const score = Math.min(100, Math.max(0, Math.round(fallbackResult.score * ratio)));
 
     return {
       score,
@@ -80,7 +88,7 @@ async function getHealthcareScore(lat, lng, localityName) {
       },
     };
   } catch (err) {
-    return getFallbackScore(lat, lng, localityName);
+    return fallbackResult;
   }
 }
 

@@ -3,11 +3,12 @@ const axios = require('axios');
 // Fallback AQI scores by locality when CPCB API key is missing
 const AQI_LOCALITY_SCORES = {
   'koregaon park': 85, 'baner': 88, 'aundh': 82, 'kothrud': 78,
-  'wakad': 72, 'hinjewadi': 75, 'viman nagar': 80, 'hadapsar': 62,
-  'kharadi': 68, 'dhanori': 58, 'pimpri': 65, 'chinchwad': 62,
-  'magarpatta': 70, 'kalyani nagar': 80, 'pimple saudagar': 72,
-  'nibm': 68, 'kondhwa': 65, 'katraj': 62, 'warje': 70,
-  'pune': 72,
+  'wakad': 72, 'hinjewadi': 70, 'viman nagar': 80, 'hadapsar': 62,
+  'kharadi': 68, 'dhanori': 52, 'chinchwad': 62, 'magarpatta': 70,
+  'kalyani nagar': 80, 'pimple saudagar': 72, 'nibm': 68,
+  'kondhwa': 65, 'katraj': 62, 'warje': 70, 'wagholi': 62,
+  // Generic entries last — prevents ", Pune" suffix from matching prematurely
+  'pimpri': 65, 'pune': 72,
 };
 
 /**
@@ -146,9 +147,10 @@ async function getAqiScore(lat, lng, localityName) {
     const aqiRaw = parseFloat(nearest.pollutant_avg);
     const aqi = isNaN(aqiRaw) ? null : aqiRaw;
 
-    // Station returned AQI 0 or null — sensor has no current reading.
+    // Station returned AQI 0 / near-zero / null — sensor has no current reading.
+    // Values < 10 are effectively zero (sensor malfunction or no data).
     // Fall back to locality-based estimate instead of scoring 100.
-    if (!aqi || aqi === 0) {
+    if (!aqi || aqi < 10) {
       console.log(`[AQI] Station "${nearest.station || nearest.city}" returned AQI=${aqiRaw} — treating as missing, using locality fallback`);
       const search = (localityName || '').toLowerCase();
       for (const [key, fallbackScore] of Object.entries(AQI_LOCALITY_SCORES)) {

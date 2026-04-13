@@ -47,14 +47,14 @@ function getWeights(profile) {
       property_value: 0.15, greenery: 0.02,
     },
     retiree: {
-      air_quality: 0.15, school_quality: 0.03, flood_risk: 0.10,
-      healthcare: 0.30, crime_safety: 0.20, transport: 0.05,
+      air_quality: 0.15, school_quality: 0.02, flood_risk: 0.08,
+      healthcare: 0.35, crime_safety: 0.18, transport: 0.05,
       property_value: 0.02, greenery: 0.15,
     },
     investor: {
-      air_quality: 0.05, school_quality: 0.15, flood_risk: 0.03,
-      healthcare: 0.10, crime_safety: 0.10, transport: 0.20,
-      property_value: 0.35, greenery: 0.02,
+      air_quality: 0.05, school_quality: 0.10, flood_risk: 0.03,
+      healthcare: 0.05, crime_safety: 0.05, transport: 0.17,
+      property_value: 0.45, greenery: 0.10,
     },
   };
   return profiles[profile] || profiles.general;
@@ -154,6 +154,10 @@ async function runScoringPipeline(lat, lng, locality_name, profile = 'general') 
   return response;
 }
 
+// In-memory cache for scoring results (avoids stale Firestore entries, fast for repeated requests)
+const memoryCache = new Map();
+const MEMORY_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
 /**
  * POST /api/score — run full scoring pipeline.
  */
@@ -191,7 +195,15 @@ router.post('/', async (req, res) => {
     const validProfiles = ['general', 'family', 'professional', 'retiree', 'investor'];
     const sanitizedProfile = validProfiles.includes(profile) ? profile : 'general';
 
+    // Check in-memory cache first
+    const cacheKey = `${sanitizedLocality.toLowerCase()}_${sanitizedProfile}`;
+    const cached = memoryCache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp) < MEMORY_CACHE_TTL) {
+      return res.json({ ...cached.data, cached: true });
+    }
+
     const response = await runScoringPipeline(latitude, longitude, sanitizedLocality, sanitizedProfile);
+    memoryCache.set(cacheKey, { data: response, timestamp: Date.now() });
     res.json(response);
   } catch (err) {
     console.error('Score endpoint error:', err);
