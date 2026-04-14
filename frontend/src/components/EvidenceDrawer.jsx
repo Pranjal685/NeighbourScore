@@ -296,14 +296,26 @@ function CrimeSafetyEvidence({ raw }) {
       )}
       <SourceBadge label="NCRB Crime in India 2023" />
 
-      {news.length > 0 && (
-        <div style={{ marginTop: 14 }}>
-          <div style={sectionLabel}>Recent News</div>
-          {news.slice(0, 3).map((article, i) => (
-            <NewsCard key={i} article={article} />
-          ))}
-        </div>
-      )}
+      <div style={{ marginTop: 14 }}>
+        <div style={sectionLabel}>Recent News</div>
+        {news.length === 0 ? (
+          // FIX 4 — fallback when no relevant local news found
+          <div style={{ fontSize: 12, color: '#64748B', fontStyle: 'italic' }}>
+            No recent local crime news found for this area.
+            Data based on NCRB 2023 annual report.
+          </div>
+        ) : (
+          <>
+            {news.slice(0, 3).map((article, i) => (
+              <NewsCard key={i} article={article} />
+            ))}
+            {/* FIX 4 — disclaimer below news items */}
+            <div style={{ fontSize: 10, color: '#64748B', marginTop: 6 }}>
+              News sourced from Indian publications. Verify before making decisions.
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
