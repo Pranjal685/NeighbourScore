@@ -2,283 +2,265 @@
 ## AI Neighborhood Intelligence Platform
 ### Google Solution Challenge 2026 | Hack2Skill | Open Innovation Track (PS5)
 ### Prize Pool: ₹10,00,000 | Deadline: April 24, 2026
-### Today's Date: April 12, 2026 | Days Remaining: 12
+### Last Updated: April 15, 2026 | Days Remaining: 9
 
 ---
 
 ## CURRENT BUILD STATUS
 
 ### ✅ COMPLETED
-- Phase 1 — Data Prep
-  - Task A: CBSE schools CSV ingested to Firestore (schools collection, geohash indexed)
-  - Task B: Flood zones hardcoded with real Pune coordinates (flood_zones collection)
-  - Task C: NCRB crime data ingested for all 35 Maharashtra districts (crime_data collection)
-  - Firestore indexes created for schools (geohash6) and flood_zones (bbox)
 
-- Phase 2 — Backend
-  - Node.js + Express server running on port 3000
-  - POST /api/score endpoint working end to end
-  - All 8 scoring services implemented:
-    - aqi.js (CPCB API + locality fallback)
-    - schools.js (Firestore geohash radius query)
-    - flood.js (Turf.js point-in-polygon)
-    - healthcare.js (Google Maps Places + locality fallback)
-    - crime.js (Firestore district lookup)
-    - transport.js (Google Maps Places + locality fallback)
-    - greenery.js (Google Maps Places + locality fallback)
-    - property.js (hardcoded Pune locality map)
-  - gemini.js (Gemini 1.5 Flash narrative generation)
-  - Score caching in Firestore (score_cache collection)
-  - Profile-based weight system (general/family/professional/retiree/investor)
-  - Crime scores fixed — Pune district now scores 62 (realistic)
+**Phase 1 — Data Prep**
+- Task A: CBSE schools CSV ingested to Firestore (schools collection, geohash indexed)
+- Task B: Flood zones hardcoded with real Pune coordinates (flood_zones collection)
+- Task C: NCRB crime data ingested for all 35 Maharashtra districts (crime_data collection)
+- Firestore indexes created for schools (geohash6) and flood_zones (bbox)
 
-- Phase 3 — Frontend
-  - React + Tailwind + Framer Motion
-  - Landing page with 5 sections:
-    - Hero with two-column layout + static Baner preview card
-    - Problem section (3 cards)
-    - How it works (3 steps)
-    - Data sources (6 cards)
-    - Final CTA
-  - Profile selector (4 options: Family/Professional/Retiree/Investor)
-  - Loading screen with animated dimension rows
-  - Report card with radar chart, score gauge, 3-tier dimension layout
-  - Dark Google Map with custom styling
-  - Compare mode (side by side, winner banner)
-  - Framer Motion animations throughout
-  - Google Places Autocomplete (Pune region)
-  - Color palette: deep slate (#0D1117) + warm amber (#E6A817) + green (#3FB950)
-  - Font: Instrument Serif (display) + Inter (body)
+**Phase 2 — Backend**
+- Node.js + Express server running on port 5000
+- POST /api/score endpoint working end to end
+- All 8 scoring services with LIVE data:
+  - aqi.js — CPCB API, Maharashtra filter, nearest Pune station
+  - schools.js — Firestore geohash radius query
+  - flood.js — Turf.js point-in-polygon
+  - healthcare.js — Google Maps Places API live
+  - crime.js — Firestore district lookup
+  - transport.js — Google Maps Places API transit_station
+  - greenery.js — Google Maps Places API live
+  - property.js — Gemini Search grounding live 2026 prices
+  - gemini.js — Gemini 1.5 Flash narrative generation
+  - newsService.js — GNews API Pune crime news, 10min cache, retry logic
+  - alternatives.js — Nearby better localities, qualitative reasons only
+- Score caching in Firestore (profile-scoped cache keys)
+- Profile-based weight system (general/family/professional/retiree/investor)
+- Rate limiting (20 req/min per IP)
+- Input validation (India bbox, XSS, injection protection)
+- Shareable URLs — GET /api/report/:slug
+- shared_reports Firestore collection with view_count
 
-- GitHub: https://github.com/Pranjal685/NeighbourScore
-  - 2 commits pushed, authored as Pranjal685
+**Phase 3 — Frontend**
+- React + Tailwind + Framer Motion
+- Design: Glassmorphism + Minimalism
+- Font: Inter + DM Serif Display
+- Colors: #F0F4FF base, #6366F1 indigo, #E6A817 amber, #10B981 green
 
-### ⚠️ KNOWN ISSUES TO FIX
-- Google Places API (healthcare/transport/greenery) using fallback scores
-  because billing prepayment (₹1000) is pending
-  → Will fix when billing clears, fallback scores are realistic for now
-- CPCB API key not yet added to .env (using locality-based AQI fallback)
-  → Get free key from data.gov.in — register and copy from profile
-- Gemini API hitting rate limits occasionally (free tier daily quota)
-  → Fallback narratives working correctly
-- Layout width still slightly narrow on some sections
-  → In progress
+Landing page (5 sections):
+  - Hero two-column + static Baner preview card
+  - Problem section (3 cards with icons)
+  - How it works (3 steps)
+  - Data sources (6 cards)
+  - Final CTA with animated stats
+
+Report card:
+  - SVG animated score gauge + counter
+  - Recharts RadarChart (8 dimensions)
+  - 3-tier dimension layout
+  - Evidence drawer per dimension
+  - Red flag alerts (score < 45)
+  - Nearby alternatives (qualitative reasons)
+  - Dark styled Google Map
+  - Compare mode
+  - Scroll progress bar
+
+Profile selector (4 options):
+  Family / Professional / Retiree / Investor
+
+Shareable URLs:
+  - /report/:slug with WhatsApp share modal
+
+Animations (8 total):
+  1. Scroll-triggered number counters
+  2. Score gauge ring draw + counter
+  3. Staggered dimension card entrance
+  4. Floating background blobs
+  5. Search bar focus glow
+  6. Red flag shake
+  7. Nearby alternatives hover lift
+  8. Scroll progress bar
+
+Mobile responsive:
+  - 320px to 1440px all breakpoints clean
+  - No horizontal scroll anywhere
+  - Bottom sheet evidence drawer on mobile
+
+**Testing — 52/52 passing**
+- scoring.test.js: 8/8
+- stress.test.js: 5/5
+- security.test.js: 8/8
+- hardcore_stress.test.js: 31/31
+- 16/16 head-to-head matchups correct
+- 15 Pune localities validated
 
 ### ❌ NOT YET DONE
-- Stress testing (automated test suite)
-- Security audit (API validation, rate limiting, CORS, Firebase rules)
-- API call optimization (caching audit, redundant calls)
-- Deployment to Firebase Hosting
-- Backend deployment to Railway
-- GitHub README (detailed, with screenshots)
-- Demo video (2 min max, Wakad → compare Baner)
-- Project deck (slides for submission)
-- Submission on Hack2Skill portal
+- Pune Neighborhood Heat Map (building next)
+- Project deck (12 slides)
+- Demo video (2 min)
+- Deployment — Railway + Firebase Hosting
+- Submission on Hack2Skill
+
+### ❌ FEATURES DECIDED AGAINST
+- Hindi language toggle — browser auto-translate sufficient
+- 99acres/MagicBricks scraping — legally grey
 
 ---
 
-## TOMORROW'S PRIORITY ORDER
+## NEXT FEATURE — Pune Neighborhood Heat Map
 
-### Priority 1 — Stress Testing (automated)
-Location: tests/ folder in project root
-Tools: Jest + Axios
-Run: npm test from project root
+Interactive Google Map of Pune with colored polygon overlays
+per locality showing NeighbourScore at a glance.
 
-Tests to write:
-  tests/stress.test.js
-    - 50 concurrent POST /api/score requests
-    - All 5 localities: Wakad, Baner, Koregaon Park, Hinjewadi, Kothrud
-    - Response time assertions (p95 under 10 seconds)
-    - All 8 dimensions present in every response
-    - No score is 0 or undefined
-    - Composite always between 20 and 100
+Green = 75+, Amber = 55-74, Red = below 55
 
-  tests/scoring.test.js
-    - Koregaon Park composite > Dhanori composite
-    - Baner composite > Wakad composite
-    - Family profile school_quality weight = 0.35
-    - Professional profile transport weight = 0.25
-    - All 4 profiles produce different composites for same locality
-    - No dimension score ever equals 0
+Polygon colors from leaderboard:
+```
+Koregaon Park  80  green
+Kalyani Nagar  77  green
+Baner          76  green
+Kothrud        75  green
+Aundh          73  green
+Viman Nagar    71  amber
+Magarpatta     70  amber
+Kharadi        67  amber
+Hinjewadi      66  amber
+Hadapsar       64  amber
+Kondhwa        61  amber
+Katraj         60  amber
+Wakad          58  amber
+Wagholi        55  amber
+Dhanori        50  red
+```
 
-  tests/api.test.js
-    - POST /api/score with missing lat returns 400
-    - POST /api/score with missing lng returns 400
-    - POST /api/score with invalid locality still returns valid response
-    - GET /health returns { status: 'ok' }
-    - POST /api/score with extremely long locality_name is handled safely
-
-### Priority 2 — Security Audit
-Check and fix:
-  - Input validation on POST /api/score
-    locality_name must be sanitized (max 100 chars, no script tags)
-    lat must be a valid number between 6.5 and 37.5 (India bbox)
-    lng must be a valid number between 68.0 and 97.5 (India bbox)
-    profile must be one of: general/family/professional/retiree/investor
-
-  - Rate limiting
-    Install express-rate-limit
-    Limit: 20 requests per IP per minute on /api/score
-    Return 429 with message if exceeded
-
-  - CORS configuration
-    Currently using cors() with no origin restriction
-    For production: restrict to Firebase Hosting domain
-    For now: add a comment explaining this needs updating post-deploy
-
-  - Firebase Firestore rules
-    Currently likely in test mode (open read/write)
-    Go to Firebase Console → Firestore → Rules
-    Update rules to allow reads but deny writes from client:
-    rules_version = '2';
-    service cloud.firestore {
-      match /databases/{database}/documents {
-        match /{document=**} {
-          allow read: if true;
-          allow write: if false;
-        }
-      }
-    }
-
-  - Check .gitignore
-    Verify .env is in .gitignore
-    Verify firebase-adminsdk.json is in .gitignore
-    Verify no API keys appear anywhere in committed code
-
-  - Check .env.example exists with placeholder values:
-    GOOGLE_MAPS_API_KEY=your_key_here
-    GEMINI_API_KEY=your_key_here
-    FIREBASE_PROJECT_ID=your_project_id
-    PORT=3000
-    CPCB_API_KEY=your_key_here
-
-### Priority 3 — API Call Optimization
-  - Add 24-hour cache check at start of /api/score route
-    If cache hit: return cached result immediately (skip all 8 API calls)
-    If cache miss: run full pipeline and cache result
-  - Verify Promise.allSettled is being used (not Promise.all)
-  - Log response times per service to identify slowest dimension
-  - If any service takes > 5 seconds: add a 5-second timeout with fallback
-
-### Priority 4 — Deployment
-  Backend → Railway:
-    Go to railway.app → New project → Deploy from GitHub
-    Root directory: backend/
-    Add all env variables from .env
-    Copy the generated Railway URL
-
-  Frontend → Firebase Hosting:
-    Update frontend/.env: REACT_APP_API_URL=<Railway URL>
-    cd frontend && npm run build
-    firebase deploy --only hosting
-    Live URL: https://neighbourscore-492917.web.app
-
-### Priority 5 — GitHub README
-  Must include:
-  - Project description (1 paragraph)
-  - Live demo URL
-  - Problem statement
-  - Solution overview
-  - Tech stack table
-  - 8 dimensions table with data sources
-  - Setup instructions (for judges to run locally)
-  - Screenshots (landing page + report card + compare mode)
-  - Team members
-  - Hackathon track and submission info
-
-### Priority 6 — Demo Video (April 22-23)
-  Script:
-  0:00-0:20  Problem intro — "Indian families make ₹1 crore decisions with zero data"
-  0:20-0:40  Show landing page — scroll through 5 sections
-  0:40-1:00  Search "Wakad" — show loading screen with 8 dimensions fetching
-  1:00-1:20  Show report card — scroll through all sections, highlight AI narratives
-  1:20-1:40  Click Compare → search "Baner" — show winner banner
-  1:40-2:00  Show profile selector — switch to Family profile, show school weight change
-
-  Tool: Loom (free) or OBS Studio
-  Resolution: 1920x1080
-  Max length: 2 minutes
-
-### Priority 7 — Project Deck (April 22-23)
-  Slides needed:
-  1. Cover — NeighbourScore logo + tagline
-  2. Problem — the ₹1 crore decision with zero data
-  3. Solution — 8-dimension AI report card
-  4. How it works — 3 steps
-  5. Tech architecture — stack diagram
-  6. Data sources — 6 verified government sources
-  7. Demo screenshot — report card for Wakad
-  8. Google Solution Challenge alignment — PS5 Smart Resource Allocation
-  9. Team — names and roles
-  10. Live URL + GitHub link
+Hover: tooltip with name + score
+Click: triggers full analysis for that locality
+Legend: color scale in corner
 
 ---
 
-## ENVIRONMENT VARIABLES REFERENCE
+## ENVIRONMENT VARIABLES
 
-Root .env (never commit):
-  GOOGLE_MAPS_API_KEY=<set>
-  GEMINI_API_KEY=<set>
-  FIREBASE_PROJECT_ID=neighbourscore-492917
-  PORT=3000
-  CPCB_API_KEY=<not yet set — get from data.gov.in>
+Root .env:
+```
+GOOGLE_MAPS_API_KEY=<set>
+GEMINI_API_KEY=<set>
+FIREBASE_PROJECT_ID=neighbourscore-492917
+PORT=5000
+CPCB_API_KEY=<set>
+NEWS_API_KEY=<set — GNews API>
+```
 
-frontend/.env (never commit):
-  REACT_APP_GOOGLE_MAPS_API_KEY=<same as above>
-  REACT_APP_API_URL=http://localhost:3000 (update to Railway URL after deploy)
+frontend/.env:
+```
+REACT_APP_GOOGLE_MAPS_API_KEY=<same>
+REACT_APP_API_URL=http://localhost:5000
+```
 
 ---
 
 ## FIREBASE PROJECT
 
 Project ID: neighbourscore-492917
-Project name: NeighbourScore
-Firestore region: asia-south1 (Mumbai)
-Firestore collections:
-  schools       — CBSE schools with geohash indexing
-  flood_zones   — NDMA flood polygon data (5 Pune zones hardcoded)
-  crime_data    — NCRB 2023 district level (35 Maharashtra districts)
-  score_cache   — Cached API responses (24hr TTL)
+Region: asia-south1 (Mumbai)
+Collections:
+  schools, flood_zones, crime_data,
+  score_cache, shared_reports
 
 ---
 
-## GITHUB REPOSITORY
+## TECH STACK
 
-URL: https://github.com/Pranjal685/NeighbourScore
-Branch: main
-Commits: 3 (initial + phase 1&2 + phase 3)
-Status: Public
+Frontend: React 18 + Tailwind + Framer Motion + Recharts
+Backend: Node.js + Express
+Database: Firebase Firestore
+AI: Gemini 1.5 Flash
+Maps: Google Maps JS API + Geocoding + Places
+Geospatial: ngeohash + @turf/turf
+News: GNews API
+Testing: Jest + Axios
+Hosting: Firebase Hosting + Railway
 
 ---
 
-## HACKATHON SUBMISSION REQUIREMENTS
+## SCORE LEADERBOARD
+
+```
+1.  Koregaon Park   80   Premium
+2.  Kalyani Nagar   77   Premium
+3.  Baner           76   Premium
+4.  Kothrud         75   Good
+5.  Aundh           73   Good
+6.  Viman Nagar     71   Good
+7.  Magarpatta      70   Good
+8.  Kharadi         67   Good
+9.  Hinjewadi       66   Developing
+10. Hadapsar        64   Developing
+11. Kondhwa         61   Developing
+12. Katraj          60   Developing
+13. Wakad           58   Developing
+14. Wagholi         55   Developing
+15. Dhanori         50   Developing
+```
+
+---
+
+## PROFILE WEIGHTS
+
+| Dimension | General | Family | Professional | Retiree | Investor |
+|---|---|---|---|---|---|
+| air_quality | 15% | 15% | 15% | 15% | 5% |
+| school_quality | 20% | 35% | 10% | 3% | 15% |
+| flood_risk | 15% | 10% | 3% | 10% | 3% |
+| healthcare | 15% | 10% | 15% | 30% | 10% |
+| crime_safety | 15% | 20% | 15% | 20% | 10% |
+| transport | 10% | 5% | 25% | 5% | 20% |
+| property_value | 5% | 2% | 15% | 2% | 35% |
+| greenery | 5% | 3% | 2% | 15% | 2% |
+
+---
+
+## HACKATHON SUBMISSION
 
 Platform: Hack2Skill
-Track: Open Innovation (PS5 alignment)
 Deadline: April 24, 2026
 
-Required deliverables:
-  ✅ Problem statement (use Section 2 of Build Guide)
-  ✅ Solution overview (use Section 5 of Build Guide)
-  ❌ Prototype link (need Firebase Hosting URL)
-  ❌ Project deck (need to create)
-  ❌ GitHub repository with README (repo exists, README needs work)
-  ❌ Demo video (2 min max)
-
-Demo localities for video:
-  Primary search: Wakad, Pune (lat: 18.5974, lng: 73.7898)
-  Compare with: Baner, Pune (lat: 18.5590, lng: 73.7868)
-  Expected: Baner wins on Air Quality and Healthcare
-  Profile to demo: Family (school weight goes to 35%)
+Template slide structure (12 slides):
+1. Guidelines
+2. Team Details
+3. Brief about solution
+4. Opportunities / USP
+5. Features list
+6. Process flow diagram
+7. Wireframes (optional)
+8. Architecture diagram
+9. Technologies used
+10. Implementation cost (optional)
+11. MVP snapshots ← most important
+12. Future development
+13. Links (GitHub + Demo + MVP + Prototype)
+14-15. Thank you
 
 ---
 
-## TECH STACK SUMMARY
+## REMAINING TIMELINE
 
-Frontend:  React + Tailwind CSS + Framer Motion + Recharts
-Backend:   Node.js + Express
-Database:  Firebase Firestore
-Maps:      Google Maps JavaScript API + Places API + Geocoding API
-AI:        Gemini 1.5 Flash (narrative generation)
-Geospatial: ngeohash (radius queries) + @turf/turf (point-in-polygon)
-Hosting:   Firebase Hosting (frontend) + Railway (backend)
+| Task | Target |
+|---|---|
+| Pune Heat Map | April 15 |
+| Project deck | April 16-17 |
+| Demo video | April 18-20 |
+| Deploy Railway + Firebase | April 22 |
+| Submit | April 23 |
+
+---
+
+## DEMO VIDEO SCRIPT (2 min)
+
+0:00-0:15  Problem statement
+0:15-0:30  Landing page + heat map
+0:30-0:50  Search Wakad → loading screen
+0:50-1:10  Report card → open evidence drawer
+1:10-1:30  Compare with Baner → winner banner
+1:30-1:50  Profile selector → Family profile
+1:50-2:00  Share URL demo
+
+Primary locality: Wakad (lat 18.5974, lng 73.7898)
+Compare: Baner (lat 18.5590, lng 73.7868)

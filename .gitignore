@@ -50,3 +50,4 @@ frontend/build/
 *.log
 .cache/
 coverage/
+CLAUDE.md

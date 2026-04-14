@@ -629,6 +629,30 @@ body {
   }
 }
 
+/* ─── Heat map container — responsive height ─────────────────────────────── */
+.heatmap-wrap {
+  width: 100%;
+  height: 520px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  position: relative;
+}
+
+@media (max-width: 1024px) {
+  .heatmap-wrap {
+    height: 440px;
+  }
+}
+
+@media (max-width: 640px) {
+  .heatmap-wrap {
+    height: 360px;
+    border-radius: 16px;
+  }
+}
+
 /* Small mobile — 375px */
 @media (max-width: 375px) {
 

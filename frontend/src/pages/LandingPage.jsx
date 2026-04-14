@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import SearchBar from '../components/SearchBar';
 import ProfileSelector from '../components/ProfileSelector';
+import HeatMap from '../components/HeatMap';
 
 const SAMPLE_AREAS = ['Wakad', 'Baner', 'Kothrud', 'Hinjewadi', 'Koregaon Park'];
 
@@ -145,6 +146,11 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = (lat, lng, name) => {
+    setIsLoading(true);
+    onSearch(lat, lng, name, selectedProfile);
+  };
+
+  const handleHeatMapClick = ({ lat, lng, name }) => {
     setIsLoading(true);
     onSearch(lat, lng, name, selectedProfile);
   };
@@ -523,7 +529,38 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
         </div>
       </section>
 
-      {/* ── SECTION 2 — PROBLEM WE SOLVE ── */}
+      {/* ── SECTION 2 — PUNE HEAT MAP ── */}
+      <section style={{ padding: '80px 0', position: 'relative', zIndex: 1 }}>
+        <div className="section-inner">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+          >
+            <div style={{ textAlign: 'center', marginBottom: 40 }}>
+              <p style={sectionLabelStyle}>Explore Pune</p>
+              <h2 style={sectionHeadingStyle}>Pune at a glance</h2>
+              <p style={{
+                fontSize: 16,
+                color: '#94A3B8',
+                marginTop: 14,
+                lineHeight: 1.65,
+                maxWidth: 480,
+                margin: '14px auto 0',
+              }}>
+                Every neighborhood scored. Click any area to analyze.
+              </p>
+            </div>
+
+            <div className="heatmap-wrap">
+              <HeatMap onLocalityClick={handleHeatMapClick} />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── SECTION 3 — PROBLEM WE SOLVE ── */}
       <section className="section-pad">
         <div className="section-inner">
           <div style={{ textAlign: 'center', marginBottom: 64 }}>

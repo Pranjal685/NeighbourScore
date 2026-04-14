@@ -1,0 +1,290 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Koregaon Park",
+        "score": 80,
+        "tier": "premium",
+        "slug": "koregaon-park-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.8900, 18.5420],
+          [73.9000, 18.5420],
+          [73.9000, 18.5300],
+          [73.8900, 18.5300],
+          [73.8900, 18.5420]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kalyani Nagar",
+        "score": 77,
+        "tier": "premium",
+        "slug": "kalyani-nagar-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.9000, 18.5600],
+          [73.9150, 18.5600],
+          [73.9150, 18.5450],
+          [73.9000, 18.5450],
+          [73.9000, 18.5600]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Baner",
+        "score": 76,
+        "tier": "premium",
+        "slug": "baner-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.7750, 18.5650],
+          [73.7950, 18.5650],
+          [73.7950, 18.5500],
+          [73.7750, 18.5500],
+          [73.7750, 18.5650]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kothrud",
+        "score": 75,
+        "tier": "premium",
+        "slug": "kothrud-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.7950, 18.5150],
+          [73.8200, 18.5150],
+          [73.8200, 18.4950],
+          [73.7950, 18.4950],
+          [73.7950, 18.5150]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Aundh",
+        "score": 73,
+        "tier": "premium",
+        "slug": "aundh-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.8000, 18.5700],
+          [73.8200, 18.5700],
+          [73.8200, 18.5500],
+          [73.8000, 18.5500],
+          [73.8000, 18.5700]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Viman Nagar",
+        "score": 71,
+        "tier": "good",
+        "slug": "viman-nagar-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.9100, 18.5750],
+          [73.9300, 18.5750],
+          [73.9300, 18.5600],
+          [73.9100, 18.5600],
+          [73.9100, 18.5750]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Magarpatta",
+        "score": 70,
+        "tier": "good",
+        "slug": "magarpatta-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.9200, 18.5150],
+          [73.9400, 18.5150],
+          [73.9400, 18.5000],
+          [73.9200, 18.5000],
+          [73.9200, 18.5150]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kharadi",
+        "score": 67,
+        "tier": "good",
+        "slug": "kharadi-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.9400, 18.5600],
+          [73.9600, 18.5600],
+          [73.9600, 18.5450],
+          [73.9400, 18.5450],
+          [73.9400, 18.5600]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hinjewadi",
+        "score": 66,
+        "tier": "good",
+        "slug": "hinjewadi-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.7200, 18.5950],
+          [73.7500, 18.5950],
+          [73.7500, 18.5800],
+          [73.7200, 18.5800],
+          [73.7200, 18.5950]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hadapsar",
+        "score": 64,
+        "tier": "good",
+        "slug": "hadapsar-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.9150, 18.5100],
+          [73.9400, 18.5100],
+          [73.9400, 18.4900],
+          [73.9150, 18.4900],
+          [73.9150, 18.5100]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Kondhwa",
+        "score": 61,
+        "tier": "good",
+        "slug": "kondhwa-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.8800, 18.4750],
+          [73.9100, 18.4750],
+          [73.9100, 18.4550],
+          [73.8800, 18.4550],
+          [73.8800, 18.4750]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Katraj",
+        "score": 60,
+        "tier": "good",
+        "slug": "katraj-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.8500, 18.4650],
+          [73.8800, 18.4650],
+          [73.8800, 18.4450],
+          [73.8500, 18.4450],
+          [73.8500, 18.4650]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Wakad",
+        "score": 58,
+        "tier": "developing",
+        "slug": "wakad-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.7700, 18.6100],
+          [73.8000, 18.6100],
+          [73.8000, 18.5900],
+          [73.7700, 18.5900],
+          [73.7700, 18.6100]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Wagholi",
+        "score": 55,
+        "tier": "developing",
+        "slug": "wagholi-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.9700, 18.5800],
+          [74.0000, 18.5800],
+          [74.0000, 18.5600],
+          [73.9700, 18.5600],
+          [73.9700, 18.5800]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Dhanori",
+        "score": 50,
+        "tier": "developing",
+        "slug": "dhanori-pune"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [73.8900, 18.6100],
+          [73.9200, 18.6100],
+          [73.9200, 18.5950],
+          [73.8900, 18.5950],
+          [73.8900, 18.6100]
+        ]]
+      }
+    }
+  ]
+}
