@@ -33,7 +33,7 @@ function ScoreGauge({ score }) {
       initial={{ opacity: 0, scale: 0.75 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.55, ease: [0.34, 1.56, 0.64, 1], delay: 0.2 }}
-      style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}
+      className="score-gauge-wrap"
     >
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <defs>

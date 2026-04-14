@@ -29,7 +29,7 @@ function Navbar({ onNewSearch, locality, onShare }) {
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        padding: '0 32px',
+        padding: '0 20px',
         height: 58,
         display: 'flex',
         alignItems: 'center',
@@ -48,18 +48,9 @@ function Navbar({ onNewSearch, locality, onShare }) {
         <span style={{ color: 'var(--accent)' }}>N</span>eighbourScore
       </span>
 
-      {/* Breadcrumb — center */}
+      {/* Breadcrumb — center, hidden on mobile < 640px via CSS */}
       {locality && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          fontSize: 13,
-          color: '#64748B',
-          position: 'absolute',
-          left: '50%',
-          transform: 'translateX(-50%)'
-        }}>
+        <div className="nav-breadcrumb">
           <span>{city}</span>
           <ChevronRight size={12} />
           <span style={{ color: '#94A3B8', fontWeight: 600 }}>{area}</span>
@@ -101,13 +92,14 @@ function Navbar({ onNewSearch, locality, onShare }) {
             padding: '7px 14px',
             cursor: 'pointer',
             fontFamily: 'var(--font-body)',
-            transition: 'all 0.2s'
+            transition: 'all 0.2s',
+            minHeight: 34
           }}
           onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.borderColor = 'var(--border-mid)'; }}
           onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
         >
           <Search size={14} strokeWidth={1.5} />
-          New Search
+          <span className="nav-search-text">New Search</span>
         </button>
       </div>
     </motion.nav>

@@ -109,15 +109,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
       {/* ── SECTION 1 — HERO (full-bleed background) ── */}
       <section className="grid-bg" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         {/* Nav */}
-        <div style={{
-          width: '100%',
-          maxWidth: 1400,
-          margin: '0 auto',
-          padding: '24px 40px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
+        <div className="hero-nav-inner">
           <span style={{
             fontFamily: 'var(--font-heading)',
             fontSize: 22,
@@ -130,23 +122,23 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
           <span style={{
             background: 'var(--accent-soft)',
             color: 'var(--accent)',
-            fontSize: 13,
+            fontSize: 12,
             fontWeight: 500,
-            padding: '6px 16px',
+            padding: '5px 12px',
             borderRadius: 100,
-            border: '1px solid var(--accent-border)'
+            border: '1px solid var(--accent-border)',
+            whiteSpace: 'nowrap',
+            flexShrink: 1,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            maxWidth: '50vw'
           }}>
             Google Solution Challenge 2026
           </span>
         </div>
 
         {/* Hero content */}
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          padding: '40px 0 96px'
-        }}>
+        <div className="hero-content-wrap">
           <div className="section-inner">
             <div className="hero-grid">
               {/* Left: headline + search */}
@@ -163,15 +155,20 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                     padding: '7px 18px',
                     fontSize: 13,
                     color: 'var(--accent)',
-                    fontWeight: 500
+                    fontWeight: 500,
+                    maxWidth: '100%',
+                    overflow: 'hidden'
                   }}>
                     <span style={{
                       width: 7, height: 7, borderRadius: '50%',
                       background: 'var(--accent)', display: 'inline-block',
+                      flexShrink: 0,
                       animation: 'pulse-dot 2s ease-in-out infinite'
                     }} />
-                    <Award size={14} color="var(--accent)" strokeWidth={1.5} />
-                    Ranked #1 Real Estate tool on Razorpay Fix My Itch · 94.5/100
+                    <Award size={14} color="var(--accent)" strokeWidth={1.5} style={{ flexShrink: 0 }} />
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      Ranked #1 Real Estate tool on Razorpay Fix My Itch · 94.5/100
+                    </span>
                   </span>
                 </motion.div>
 
@@ -205,7 +202,8 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                     color: '#94A3B8',
                     lineHeight: 1.78,
                     marginBottom: 36,
-                    maxWidth: 540
+                    maxWidth: 540,
+                    width: '100%'
                   }}
                 >
                   Indian homebuyers spend months researching localities with no structured data.
@@ -383,7 +381,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
       </section>
 
       {/* ── SECTION 2 — PROBLEM WE SOLVE ── */}
-      <section style={{ background: 'transparent', padding: '112px 0', borderTop: '1px solid var(--border)' }}>
+      <section className="section-pad">
         <div className="section-inner">
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
             <motion.div {...inView}>
@@ -455,7 +453,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
       </section>
 
       {/* ── SECTION 3 — HOW IT WORKS ── */}
-      <section style={{ background: 'transparent', padding: '112px 0', borderTop: '1px solid var(--border)' }}>
+      <section className="section-pad">
         <div className="section-inner">
           <div style={{ textAlign: 'center', marginBottom: 72 }}>
             <motion.div {...inView}>
@@ -533,7 +531,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
       </section>
 
       {/* ── SECTION 4 — DATA SOURCES ── */}
-      <section style={{ background: 'transparent', padding: '112px 0', borderTop: '1px solid var(--border)' }}>
+      <section className="section-pad">
         <div className="section-inner">
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
             <motion.div {...inView}>
@@ -589,7 +587,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
       </section>
 
       {/* ── SECTION 5 — FINAL CTA ── */}
-      <section style={{ background: 'transparent', padding: '112px 0', borderTop: '1px solid var(--border)' }}>
+      <section className="section-pad">
         <motion.div {...inView}>
           <div className="section-inner">
             {/* Stats strip — enormous amber numbers spread across full width */}
@@ -634,11 +632,11 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                 Join thousands of Indian families making data-backed housing decisions.
               </p>
 
-              <div style={{ maxWidth: 620, margin: '0 auto 22px' }}>
+              <div style={{ maxWidth: 620, width: '100%', margin: '0 auto 22px' }}>
                 <SearchBar onSearch={handleSearch} isLoading={isLoading} />
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 22, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap', padding: '0 16px' }}>
                 {['Free', 'No signup required', 'Pune only for now'].map(t => (
                   <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#94A3B8' }}>
                     <CheckCircle size={13} color="var(--text-muted)" /> {t}

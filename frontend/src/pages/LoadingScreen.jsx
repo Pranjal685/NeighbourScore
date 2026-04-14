@@ -104,8 +104,8 @@ function LoadingScreen({ localityName }) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 14,
-                  padding: '12px 18px',
+                  gap: 10,
+                  padding: '11px 16px',
                   borderBottom: i < ROWS.length - 1 ? '1px solid var(--border)' : 'none',
                   background: done ? 'rgba(63,185,80,0.05)' : 'transparent',
                   transition: 'background 0.4s'
@@ -160,13 +160,7 @@ function LoadingScreen({ localityName }) {
                       initial={{ opacity: 0, y: 4 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.25 }}
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 600,
-                        color: '#3FB950',
-                        whiteSpace: 'nowrap',
-                        flexShrink: 0
-                      }}
+                      className="loading-row-status"
                     >
                       {row.result}
                     </motion.span>
@@ -175,12 +169,7 @@ function LoadingScreen({ localityName }) {
                       key="fetching"
                       initial={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      style={{
-                        fontSize: 12,
-                        color: '#64748B',
-                        whiteSpace: 'nowrap',
-                        flexShrink: 0
-                      }}
+                      className="loading-row-fetching"
                     >
                       {row.fetching}
                     </motion.span>

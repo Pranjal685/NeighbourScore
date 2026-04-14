@@ -132,16 +132,11 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
                 </motion.div>
               )}
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
+              <div className="score-display-row">
                 <ScoreGauge score={composite} />
                 <div>
-                  <div style={{
-                    fontSize: 80,
-                    fontWeight: 800,
-                    fontFamily: 'var(--font-heading)',
+                  <div className="score-number-display" style={{
                     color: scoreColor,
-                    lineHeight: 1,
-                    letterSpacing: '-0.05em'
                   }}>
                     {composite}
                   </div>
@@ -168,9 +163,9 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
               </div>
             </div>
 
-            {/* Right: radar chart */}
+            {/* Right: radar chart — hidden below 640px via CSS .radar-chart-panel */}
             <div
-              className="glass-card"
+              className="glass-card radar-chart-panel"
               style={{ padding: '20px 16px 8px', borderRadius: 20 }}>
               <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4, paddingLeft: 8 }}>
                 8-Dimension Profile
@@ -182,7 +177,7 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
           {/* AI Narrative */}
           {result.overall_narrative && (
             <div
-              className="glass-card"
+              className="glass-card ai-narrative-box"
               style={{
                 border: '1px solid var(--accent-border)',
                 borderRadius: 14,
@@ -235,7 +230,7 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
             <SectionLabel>
               <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Map size={14} color="#94A3B8" strokeWidth={1.5} /> Location Map</span>
             </SectionLabel>
-            <div className="map-bleed" style={{ position: 'relative', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.85)', height: 320 }}>
+            <div className="map-bleed map-container">
               <MapView lat={lat} lng={lng} />
               <div style={{
                 position: 'absolute',
@@ -269,21 +264,7 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
           >
             <button
               onClick={() => setShowCompare(true)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 9,
-                background: 'var(--accent-soft)',
-                border: '1px solid var(--accent-border)',
-                color: 'var(--accent)',
-                fontSize: 14,
-                fontWeight: 600,
-                padding: '12px 28px',
-                borderRadius: 12,
-                cursor: 'pointer',
-                fontFamily: 'var(--font-body)',
-                transition: 'all 0.2s'
-              }}
+              className="compare-trigger-btn"
               onMouseEnter={e => {
                 e.currentTarget.style.background = 'rgba(230,168,23,0.16)';
                 e.currentTarget.style.borderColor = 'rgba(230,168,23,0.4)';

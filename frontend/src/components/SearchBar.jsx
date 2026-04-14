@@ -80,7 +80,7 @@ function SearchBar({ onSearch, isLoading }) {
             border: 'none',
             outline: 'none',
             color: '#1A1A2E',
-            fontSize: 15,
+            fontSize: 16, /* 16px minimum prevents iOS auto-zoom on focus */
             flex: 1,
             padding: '9px 12px',
             fontFamily: 'var(--font-body)'

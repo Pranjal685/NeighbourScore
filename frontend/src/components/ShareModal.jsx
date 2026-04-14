@@ -66,7 +66,9 @@ function ShareModal({ isOpen, onClose, data }) {
                 margin: '0 20px',
                 padding: '28px',
                 pointerEvents: 'auto',
-                position: 'relative'
+                position: 'relative',
+                maxHeight: '90vh',
+                overflowY: 'auto'
               }}
             >
               {/* Header */}
@@ -157,8 +159,8 @@ function ShareModal({ isOpen, onClose, data }) {
                 {shareUrl}
               </div>
 
-              {/* Buttons */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {/* Buttons — stacks to single column on mobile via CSS .share-btns-grid */}
+              <div className="share-btns-grid">
                 <button
                   onClick={handleCopy}
                   className="gradient-btn"
