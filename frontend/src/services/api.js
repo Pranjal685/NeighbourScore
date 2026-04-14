@@ -9,3 +9,12 @@ export async function getScore(lat, lng, locality_name, profile = 'general') {
   if (!response.ok) throw new Error('Score API failed');
   return response.json();
 }
+
+export async function getReportBySlug(slug) {
+  const response = await fetch(`${API_URL}/api/report/${slug}`);
+  if (!response.ok) {
+    if (response.status === 404) throw new Error('Report not found');
+    throw new Error('Failed to fetch shared report');
+  }
+  return response.json();
+}

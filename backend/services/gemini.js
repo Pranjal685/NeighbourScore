@@ -6,11 +6,11 @@ const DIMENSION_KEYS = [
 ];
 
 const PROFILE_LABELS = {
-  family:       'a family with young children',
+  family: 'a family with young children',
   professional: 'a working professional',
-  retiree:      'a retiree or senior',
-  investor:     'a property investor',
-  general:      'a homebuyer',
+  retiree: 'a retiree or senior',
+  investor: 'a property investor',
+  general: 'a homebuyer',
 };
 
 /**

@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const scoreRouter = require('./routes/score');
+const reportRouter = require('./routes/report');
 
 const app = express();
 
@@ -34,6 +35,9 @@ app.get('/health', (req, res) => {
 
 // Score API (rate limited)
 app.use('/api/score', scoreLimiter, scoreRouter);
+
+// Report API
+app.use('/api/report', reportRouter);
 
 // Start server
 const PORT = process.env.PORT || 5000;

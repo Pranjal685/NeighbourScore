@@ -9,14 +9,14 @@ const TIER2 = ['healthcare', 'crime_safety', 'transport'];
 const TIER3 = ['property_value', 'greenery'];
 
 const NAMES = {
-  air_quality:    'Air Quality',
+  air_quality: 'Air Quality',
   school_quality: 'School Quality',
-  flood_risk:     'Flood Risk',
-  healthcare:     'Healthcare',
-  crime_safety:   'Crime Safety',
-  transport:      'Transport',
+  flood_risk: 'Flood Risk',
+  healthcare: 'Healthcare',
+  crime_safety: 'Crime Safety',
+  transport: 'Transport',
   property_value: 'Property Value',
-  greenery:       'Greenery & Parks',
+  greenery: 'Greenery & Parks',
 };
 
 function SectionLabel({ children, Icon, style }) {

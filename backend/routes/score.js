@@ -105,14 +105,14 @@ async function runScoringPipeline(lat, lng, locality_name, profile = 'general') 
 
   // Calculate composite score using profile weights
   const composite = Math.round(
-    dimensions.air_quality.score    * weights.air_quality +
+    dimensions.air_quality.score * weights.air_quality +
     dimensions.school_quality.score * weights.school_quality +
-    dimensions.flood_risk.score     * weights.flood_risk +
-    dimensions.healthcare.score     * weights.healthcare +
-    dimensions.crime_safety.score   * weights.crime_safety +
-    dimensions.transport.score      * weights.transport +
+    dimensions.flood_risk.score * weights.flood_risk +
+    dimensions.healthcare.score * weights.healthcare +
+    dimensions.crime_safety.score * weights.crime_safety +
+    dimensions.transport.score * weights.transport +
     dimensions.property_value.score * weights.property_value +
-    dimensions.greenery.score       * weights.greenery
+    dimensions.greenery.score * weights.greenery
   );
 
   // Generate AI narratives (profile-aware) and nearby alternatives in parallel
@@ -128,6 +128,14 @@ async function runScoringPipeline(lat, lng, locality_name, profile = 'general') 
 
   const timestamp = new Date().toISOString();
 
+  // Generate slug for shareable report
+  const slug = locality_name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .substring(0, 50);
+
   const response = {
     locality: locality_name,
     composite: Math.min(100, Math.max(0, composite)),
@@ -137,6 +145,8 @@ async function runScoringPipeline(lat, lng, locality_name, profile = 'general') 
     timestamp,
     dimensions,
     nearby_alternatives,
+    slug,
+    share_url: `/report/${slug}`,
   };
 
   // Cache to Firestore (include profile in cache key so different profiles don't clash)
@@ -146,6 +156,13 @@ async function runScoringPipeline(lat, lng, locality_name, profile = 'general') 
     await db.collection('score_cache').doc(cacheId).set({
       ...response,
       cached_at: timestamp,
+    });
+
+    // Also store for shareable URL
+    await db.collection('shared_reports').doc(slug).set({
+      ...response,
+      created_at: timestamp,
+      view_count: 0
     });
   } catch (cacheErr) {
     console.error('Cache write failed:', cacheErr.message);

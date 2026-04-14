@@ -9,6 +9,7 @@ import MapView from '../components/MapView';
 import CompareMode from '../components/CompareMode';
 import RedFlagAlert from '../components/RedFlagAlert';
 import NearbyAlternatives from '../components/NearbyAlternatives';
+import ShareModal from '../components/ShareModal';
 
 const inView = {
   initial: { opacity: 0, y: 30 },
@@ -33,14 +34,15 @@ function SectionLabel({ children }) {
 }
 
 const PROFILE_META = {
-  family:       { label: 'Family', icon: '👨‍👩‍👧' },
+  family: { label: 'Family', icon: '👨‍👩‍👧' },
   professional: { label: 'Professional', icon: '💼' },
-  retiree:      { label: 'Retiree', icon: '🧓' },
-  investor:     { label: 'Investor', icon: '🏠' },
+  retiree: { label: 'Retiree', icon: '🧓' },
+  investor: { label: 'Investor', icon: '🏠' },
 };
 
 function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
   const [showCompare, setShowCompare] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const activeProfile = result.profile || profile || 'general';
   const profileMeta = PROFILE_META[activeProfile] || null;
   const composite = Math.max(result.composite || 0, 20);
@@ -74,7 +76,7 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
       transition={{ duration: 0.5, ease: 'easeOut' }}
       style={{ minHeight: '100vh', background: 'transparent' }}
     >
-      <Navbar onNewSearch={onNewSearch} locality={result.locality} />
+      <Navbar onNewSearch={onNewSearch} locality={result.locality} onShare={() => setIsShareModalOpen(true)} />
 
       <div className="report-inner">
 
@@ -167,7 +169,7 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
             </div>
 
             {/* Right: radar chart */}
-            <div 
+            <div
               className="glass-card"
               style={{ padding: '20px 16px 8px', borderRadius: 20 }}>
               <div style={{ fontSize: 11, color: '#64748B', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4, paddingLeft: 8 }}>
@@ -182,13 +184,13 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
             <div
               className="glass-card"
               style={{
-              border: '1px solid var(--accent-border)',
-              borderRadius: 14,
-              padding: '20px 24px',
-              display: 'flex',
-              gap: 14,
-              alignItems: 'flex-start'
-            }}>
+                border: '1px solid var(--accent-border)',
+                borderRadius: 14,
+                padding: '20px 24px',
+                display: 'flex',
+                gap: 14,
+                alignItems: 'flex-start'
+              }}>
               <div style={{
                 width: 34, height: 34, borderRadius: 8, background: 'var(--accent-soft)',
                 border: '1px solid var(--accent-border)', display: 'flex',
@@ -320,16 +322,16 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
           }}
         >
           {/* Disclaimer */}
-          <div 
+          <div
             className="glass-card"
             style={{
-            display: 'flex',
-            gap: 10,
-            alignItems: 'flex-start',
-            borderRadius: 12,
-            padding: '14px 18px',
-            marginBottom: 12
-          }}>
+              display: 'flex',
+              gap: 10,
+              alignItems: 'flex-start',
+              borderRadius: 12,
+              padding: '14px 18px',
+              marginBottom: 12
+            }}>
             <Info size={13} color="var(--text-muted)" style={{ marginTop: 2, flexShrink: 0 }} />
             <p style={{ fontSize: 12, color: '#64748B', lineHeight: 1.75, margin: 0 }}>
               <strong style={{ color: '#94A3B8' }}>Data disclaimer:</strong>{' '}
@@ -348,6 +350,12 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
           </p>
         </motion.div>
       </div>
+
+      <ShareModal 
+        isOpen={isShareModalOpen} 
+        onClose={() => setIsShareModalOpen(false)} 
+        data={result} 
+      />
     </motion.div>
   );
 }

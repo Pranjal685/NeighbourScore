@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { LoadScript } from '@react-google-maps/api';
 import LandingPage from './pages/LandingPage';
 import LoadingScreen from './pages/LoadingScreen';
 import ReportPage from './pages/ReportPage';
-import { getScore } from './services/api';
+import { getScore, getReportBySlug } from './services/api';
 
 const LIBRARIES = ['places'];
 
@@ -14,6 +14,29 @@ function App() {
   const [location, setLocation] = useState({ lat: null, lng: null, name: '' });
   const [selectedProfile, setSelectedProfile] = useState('general');
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path.startsWith('/report/')) {
+      const slug = path.split('/report/')[1];
+      if (slug) {
+        setAppState('loading');
+        getReportBySlug(slug)
+          .then(data => {
+            setResult(data);
+            setLocation({ lat: null, lng: null, name: data.locality });
+            setSelectedProfile(data.profile || 'general');
+            setAppState('results');
+          })
+          .catch(err => {
+            console.error(err);
+            setError('Report not found or could not be loaded.');
+            setAppState('search');
+            window.history.pushState({}, '', '/');
+          });
+      }
+    }
+  }, []);
 
   const handleSearch = async (lat, lng, name, profile) => {
     const activeProfile = profile || selectedProfile || 'general';
@@ -36,6 +59,7 @@ function App() {
   };
 
   const handleNewSearch = () => {
+    window.history.pushState({}, '', '/');
     setAppState('search');
     setResult(null);
     setError(null);

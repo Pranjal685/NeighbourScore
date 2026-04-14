@@ -1,0 +1,40 @@
+feat: Phase 3 complete â€” React frontend + user profile personalisation
+
+FRONTEND (new â€” frontend/src/)
+- LandingPage: full-width hero, problem, how-it-works, data sources, CTA sections
+- ReportPage: score hero, radar chart, 3-tier dimension grid, full-bleed map, compare mode
+- LoadingScreen: animated dots with minimum 2s display
+- ProfileSelector: 4-card selector (Family / Professional / Retiree / Investor)
+  selecting a profile reweights the composite score without changing dimension scores
+- SearchBar: Google Places Autocomplete restricted to Pune region
+- ScoreGauge: SVG animated circular progress ring (CSS keyframe)
+- DimensionCard: Tier1/2/3 cards with score, progress bar, AI narrative, weight label
+- DimensionGrid: 3-tier responsive grid (3-col desktop â†’ 2-col tablet â†’ 1-col mobile)
+- RadarChart: Recharts radar with optional second-series overlay for compare mode
+- MapView: Google Maps dark-styled with location marker
+- CompareMode: second locality search, radar overlay, side-by-side winner/loser cards
+- Navbar: sticky with breadcrumb, share, new-search actions
+- Layout: single .section-inner centering wrapper (max-width 1400px, padding 0 40px)
+  all grid classes are pure layout (width 100%, no own max-width) â€” eliminates
+  double-constraining that caused the narrow-column dead-zone problem at 1440px
+- Responsive: 1024px (tablet padding 24px), 768px (mobile padding 16px, stacked grids)
+- Map full-bleed via .map-bleed class (calc(100% + 80px) / margin-left: -40px)
+
+BACKEND â€” profile personalisation (backend/routes/score.js, services/gemini.js)
+- getWeights(profile): returns weight map for general/family/professional/retiree/investor
+- runScoringPipeline: accepts profile param, applies dynamic weights to composite calc
+- Each dimension weight string in response reflects actual profile weight (e.g. "35%")
+- Response includes profile + weights_used fields
+- Cache key is profile-scoped (wakad_pune_family) to prevent cross-profile cache hits
+- generateNarratives(dimensions, locality, profile): Gemini prompt now includes profile
+  label and persona-specific instructions; fallback narratives also reference profile
+
+BACKEND â€” service reliability improvements
+- aqi.js: improved station matching, added distance_km to raw output
+- schools.js: added geohash5 fallback query path, improved haversine filter
+- healthcare.js, greenery.js, transport.js: locality-name fallback when Places API
+  returns no results, ensuring score is never silently zero
+
+DOCS
+- README: fully rewritten to document all 3 phases, API with profile param,
+  architecture diagram, profile weight tables, known limitations, Firestore schema

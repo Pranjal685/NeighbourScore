@@ -12,28 +12,28 @@ export function getScoreColor(score) {
 }
 
 const ICON_MAP = {
-  air_quality:    Wind,
+  air_quality: Wind,
   school_quality: GraduationCap,
-  flood_risk:     Waves,
-  healthcare:     HeartPulse,
-  crime_safety:   Shield,
-  transport:      Bus,
+  flood_risk: Waves,
+  healthcare: HeartPulse,
+  crime_safety: Shield,
+  transport: Bus,
   property_value: TrendingUp,
-  greenery:       Trees,
+  greenery: Trees,
 };
 
 const RAW_STAT = {
-  air_quality:    d => {
+  air_quality: d => {
     if (!d?.aqi || d.aqi === 0 || d.fallback) return d?.station_name ? `${d.station_name} · Locality estimate` : 'Locality estimate';
     return `AQI ${d.aqi} · ${d.station_name || 'Nearest station'}`;
   },
   school_quality: d => d?.count != null ? `${d.count} CBSE schools · 3km radius` : null,
-  flood_risk:     d => d?.in_flood_zone != null ? (d.in_flood_zone ? 'Located in flood zone' : 'Outside flood zone') : null,
-  healthcare:     d => d?.count != null ? `${d.count} hospitals · 3km radius` : null,
-  crime_safety:   d => d?.district   ? `${d.district} district · Rate ${Math.round(d.crime_rate || 0)}/100k` : null,
-  transport:      d => d?.count != null ? `${d.count} bus stops · 500m radius` : null,
+  flood_risk: d => d?.in_flood_zone != null ? (d.in_flood_zone ? 'Located in flood zone' : 'Outside flood zone') : null,
+  healthcare: d => d?.count != null ? `${d.count} hospitals · 3km radius` : null,
+  crime_safety: d => d?.district ? `${d.district} district · Rate ${Math.round(d.crime_rate || 0)}/100k` : null,
+  transport: d => d?.count != null ? `${d.count} bus stops · 500m radius` : null,
   property_value: d => d?.price_per_sqft ? `₹${d.price_per_sqft.toLocaleString('en-IN')}/sqft · ${d.trend_12m_pct > 0 ? '+' : ''}${d.trend_12m_pct}% trend` : null,
-  greenery:       d => d?.count != null ? `${d.count} parks · 1km radius` : null,
+  greenery: d => d?.count != null ? `${d.count} parks · 1km radius` : null,
 };
 
 function ProgressBar({ score, color, delay = 0 }) {
@@ -113,11 +113,11 @@ function EvidenceModal({ isExpanded, setIsExpanded, dimensionKey, name, color, r
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <div style={{ fontSize: 18, fontWeight: 700, color: '#1A1A2E' }}>{name} Data</div>
-              <button 
+              <button
                 onClick={(e) => { e.stopPropagation(); setIsExpanded(false); }}
-                style={{ 
-                  background: 'rgba(0,0,0,0.05)', border: 'none', 
-                  borderRadius: '50%', width: 32, height: 32, 
+                style={{
+                  background: 'rgba(0,0,0,0.05)', border: 'none',
+                  borderRadius: '50%', width: 32, height: 32,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', color: '#64748B'
                 }}
@@ -125,7 +125,7 @@ function EvidenceModal({ isExpanded, setIsExpanded, dimensionKey, name, color, r
                 <X size={18} />
               </button>
             </div>
-            
+
             <EvidenceDrawer dimensionKey={dimensionKey} raw={raw} score={displayScore} />
           </motion.div>
         </motion.div>
