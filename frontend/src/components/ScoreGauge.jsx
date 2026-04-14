@@ -17,7 +17,7 @@ export function getScoreLabel(score) {
 
 function ScoreGauge({ score }) {
   const displayScore = Math.max(score || 0, 20);
-  const animatedScore = useCountUp(displayScore, 1500);
+  const animatedScore = useCountUp(displayScore, 1800);
   const color = getScoreColor(displayScore);
 
   const size = 210;
@@ -62,16 +62,24 @@ function ScoreGauge({ score }) {
         />
 
         {/* Progress ring */}
-        <circle
+        <motion.circle
           cx={cx} cy={cy} r={radius}
           fill="none"
           stroke={color}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
-          strokeDasharray={`${filled} ${circumference}`}
-          transform={`rotate(-90 ${cx} ${cy})`}
+          strokeDasharray={`${circumference} ${circumference}`}
           filter="url(#gaugeGlow)"
-          style={{ transition: 'stroke-dasharray 0.05s linear, stroke 0.3s' }}
+          initial={{ strokeDashoffset: circumference, strokeOpacity: 1 }}
+          animate={{
+            strokeDashoffset: circumference - filled,
+            strokeOpacity: [1, 1.3, 1]
+          }}
+          transition={{
+            strokeDashoffset: { duration: 1.8, ease: [0.25, 0.4, 0.25, 1] },
+            strokeOpacity: { duration: 0.3, delay: 1.8 }
+          }}
+          style={{ transform: 'rotate(-90deg)', transformOrigin: 'center' }}
         />
 
         {/* Score number */}

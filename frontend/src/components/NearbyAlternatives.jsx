@@ -1,13 +1,11 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { getScoreColor } from './DimensionCard';
-import { Navigation, ArrowUpRight } from 'lucide-react';
+import { Navigation } from 'lucide-react';
 
 function NearbyAlternatives({ alternatives, onSearch }) {
   if (!alternatives || alternatives.length === 0) return null;
 
   return (
-    <div 
+    <div
       className="glass-card"
       style={{
       borderRadius: 16,
@@ -20,7 +18,7 @@ function NearbyAlternatives({ alternatives, onSearch }) {
           <Navigation size={18} color="#6366F1" strokeWidth={1.5} /> Better Alternatives Nearby
         </div>
         <div style={{ fontSize: 13, color: '#64748B', marginTop: 4 }}>
-          Areas within reach with higher NeighbourScores
+          Areas within reach worth exploring
         </div>
       </div>
 
@@ -31,74 +29,64 @@ function NearbyAlternatives({ alternatives, onSearch }) {
         marginTop: 20,
         flexWrap: 'wrap',
       }}>
-        {alternatives.map((alt, i) => {
-          const scoreColor = getScoreColor(alt.score);
-          return (
-            <motion.div
-              key={alt.name}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.35, delay: i * 0.1 }}
-              whileHover={{ y: -2, borderColor: 'rgba(0,0,0,0.1)' }}
-              onClick={() => onSearch && onSearch(alt.name + ', Pune')}
-              className="glass-card"
-              style={{
-                borderRadius: 12,
-                padding: '16px 20px',
-                flex: '1 1 160px',
-                cursor: 'pointer',
-                transition: 'border-color 0.2s',
-                minWidth: 150,
-              }}
-            >
-              {/* Area name */}
-              <div style={{ fontSize: 15, fontWeight: 600, color: '#1A1A2E', marginBottom: 8 }}>
-                {alt.name}
-              </div>
+        {alternatives.map((alt, i) => (
+          <motion.div
+            key={alt.name}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.35, delay: i * 0.1 }}
+            whileHover="hover"
+            whileTap={{ scale: 0.98 }}
+            variants={{
+              hover: {
+                y: -6,
+                boxShadow: '0 20px 40px rgba(99,102,241,0.15), 0 8px 16px rgba(0,0,0,0.1)',
+                borderColor: 'rgba(99,102,241,0.3)',
+                transition: { type: 'spring', stiffness: 400, damping: 25 }
+              }
+            }}
+            onClick={() => onSearch && onSearch(alt.name + ', Pune')}
+            className="glass-card"
+            style={{
+              borderRadius: 12,
+              padding: '16px 20px',
+              flex: '1 1 160px',
+              cursor: 'pointer',
+              transition: 'border-color 0.2s',
+              minWidth: 150,
+            }}
+          >
+            {/* Area name */}
+            <div style={{ fontSize: 15, fontWeight: 600, color: '#1A1A2E', marginBottom: 4 }}>
+              {alt.name}
+            </div>
 
-              {/* Score */}
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 6 }}>
-                <span style={{
-                  fontSize: 28,
-                  fontWeight: 800,
-                  color: scoreColor,
-                  fontFamily: 'var(--font-heading)',
-                  letterSpacing: '-0.04em',
-                  lineHeight: 1,
-                }}>
-                  {alt.score}
-                </span>
-                <span style={{ fontSize: 13, color: '#64748B' }}>/ 100</span>
-              </div>
+            {/* Distance */}
+            <div style={{ fontSize: 12, color: '#64748B', marginBottom: 12 }}>
+              ~{alt.distance_km} km away
+            </div>
 
-              {/* Distance */}
-              <div style={{ fontSize: 12, color: '#64748B', marginBottom: 8 }}>
-                ~{alt.distance_km} km away
-              </div>
+            {/* Why better tag */}
+            <div style={{
+              display: 'inline-block',
+              background: 'rgba(16,185,129,0.1)',
+              color: '#10B981',
+              fontSize: 12,
+              padding: '4px 10px',
+              borderRadius: 6,
+              marginBottom: 12,
+              lineHeight: 1.4,
+            }}>
+              {alt.why_better}
+            </div>
 
-              {/* Improvement pill & Arrow */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                <div style={{
-                  display: 'inline-block',
-                  background: 'rgba(63,185,80,0.1)',
-                  color: '#3FB950',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  padding: '2px 8px',
-                  borderRadius: 100,
-                }}>
-                  +{alt.improvement} vs current area
-                </div>
-                <ArrowUpRight size={14} color="#64748B" strokeWidth={1.5} />
-              </div>
-
-              {/* CTA */}
-              <div style={{ fontSize: 11, color: '#64748B' }}>
-                Click to analyze →
-              </div>
-            </motion.div>
-          );
-        })}
+            {/* CTA */}
+            <div style={{ fontSize: 12, color: '#64748B', display: 'flex', alignItems: 'center', gap: 4 }}>
+              Analyze this area
+              <motion.span variants={{ hover: { x: 4 } }}>→</motion.span>
+            </div>
+          </motion.div>
+        ))}
       </div>
     </div>
   );

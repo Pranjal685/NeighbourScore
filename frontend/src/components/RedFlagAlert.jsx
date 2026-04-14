@@ -88,8 +88,20 @@ function RedFlagAlert({ dimensions }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+      animate={{ 
+        opacity: 1, 
+        y: 0,
+        x: [0, -8, 8, -6, 6, -4, 4, -2, 2, 0]
+      }}
+      transition={{ 
+        opacity: { duration: 0.3 },
+        y: { duration: 0.3 },
+        x: { 
+          duration: 0.6, 
+          delay: 0.4,
+          ease: 'easeInOut'
+        }
+      }}
       style={{
         background: 'rgba(239,68,68,0.06)',
         border: '1px solid rgba(239,68,68,0.2)',

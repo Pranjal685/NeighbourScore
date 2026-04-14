@@ -145,10 +145,10 @@ export function Tier1Card({ dimensionKey, name, score, weight, narrative, raw, i
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.08 }}
+      initial={{ opacity: 0, y: 32, scale: 0.97 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, delay: index * 0.08, ease: [0.25, 0.4, 0.25, 1] }}
       onClick={() => setIsExpanded(!isExpanded)}
       className="glass-card"
       style={{
@@ -241,10 +241,10 @@ export function Tier2Card({ dimensionKey, name, score, weight, narrative, raw, i
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.08 }}
+      initial={{ opacity: 0, y: 32, scale: 0.97 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, delay: index * 0.08, ease: [0.25, 0.4, 0.25, 1] }}
       onClick={() => setIsExpanded(!isExpanded)}
       className="glass-card"
       style={{
@@ -323,10 +323,10 @@ export function Tier3Card({ dimensionKey, name, score, weight, narrative, raw, i
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.45, delay: index * 0.08 }}
+      initial={{ opacity: 0, y: 32, scale: 0.97 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, delay: index * 0.08, ease: [0.25, 0.4, 0.25, 1] }}
       onClick={() => setIsExpanded(!isExpanded)}
       className="glass-card"
       style={{

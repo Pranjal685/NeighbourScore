@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import {
   Wind, GraduationCap, Waves, Shield, Map,
   Trees, BarChart3,
@@ -81,6 +81,66 @@ const sectionHeadingStyle = {
   lineHeight: 1.15
 };
 
+function AnimatedStat({ num, label, Icon, index }) {
+  const ref = React.useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [value, setValue] = React.useState(0);
+
+  const isFloat = num.includes('.');
+  const hasPlus = num.includes('+');
+  const target = parseFloat(num.replace(/,/g, '').replace('+', ''));
+  
+  const duration = index === 0 ? 1200 : index === 1 ? 1500 : 2000;
+  
+  React.useEffect(() => {
+    if (isInView) {
+      const start = performance.now();
+      let rafId;
+      function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        setValue(target * eased);
+        if (progress < 1) rafId = requestAnimationFrame(update);
+        else setValue(target);
+      }
+      rafId = requestAnimationFrame(update);
+      return () => cancelAnimationFrame(rafId);
+    }
+  }, [isInView, target, duration]);
+
+  let displayStr = isFloat 
+    ? value.toFixed(1) 
+    : Math.floor(value).toLocaleString('en-IN');
+  
+  if (hasPlus && value === target) displayStr += '+';
+
+  return (
+    <motion.div 
+      ref={ref}
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={isInView ? { scale: 1, opacity: 1 } : {}}
+      transition={{ duration: 0.5, delay: index * 0.2 }}
+      style={{ textAlign: 'center' }}
+    >
+      <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
+        <Icon size={28} color="#6366F1" strokeWidth={1.5} />
+      </div>
+      <div style={{
+        fontSize: 'clamp(56px, 7vw, 80px)',
+        fontWeight: 800,
+        fontFamily: 'var(--font-heading)',
+        color: 'var(--accent)',
+        letterSpacing: '-0.03em',
+        lineHeight: 1
+      }}>
+        {displayStr}
+      </div>
+      <div style={{ fontSize: 14, color: '#94A3B8', marginTop: 12, letterSpacing: '0.02em' }}>{label}</div>
+    </motion.div>
+  );
+}
+
 function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -104,10 +164,93 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
   };
 
   return (
-    <div style={{ background: 'transparent', minHeight: '100vh' }}>
+    <div style={{ background: 'transparent', minHeight: '100vh', position: 'relative' }}>
+      {/* Background Blobs */}
+      <div className="blob-container" style={{ 
+        position: 'fixed', 
+        inset: 0, 
+        overflow: 'hidden', 
+        pointerEvents: 'none',
+        zIndex: 0 
+      }}>
+        {/* Blob 1 — Indigo, top left */}
+        <motion.div
+          style={{
+            position: 'absolute',
+            width: '600px',
+            height: '600px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%)',
+            top: '-200px',
+            left: '-200px',
+            filter: 'blur(40px)',
+          }}
+          animate={{
+            x: [0, 30, -20, 10, 0],
+            y: [0, -20, 30, -10, 0],
+            scale: [1, 1.05, 0.97, 1.03, 1],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+        
+        {/* Blob 2 — Amber, top right */}
+        <motion.div
+          style={{
+            position: 'absolute',
+            width: '500px',
+            height: '500px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(230,168,23,0.14) 0%, transparent 70%)',
+            top: '-150px',
+            right: '-150px',
+            filter: 'blur(40px)',
+          }}
+          animate={{
+            x: [0, -25, 15, -10, 0],
+            y: [0, 20, -30, 15, 0],
+            scale: [1, 0.97, 1.05, 0.98, 1],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 2,
+          }}
+        />
+        
+        {/* Blob 3 — Green, bottom center */}
+        <motion.div
+          style={{
+            position: 'absolute',
+            width: '400px',
+            height: '400px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%)',
+            bottom: '-100px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            filter: 'blur(40px)',
+          }}
+          animate={{
+            x: [0, 20, -20, 10, 0],
+            y: [0, -15, 20, -10, 0],
+            scale: [1, 1.08, 0.95, 1.04, 1],
+          }}
+          transition={{
+            duration: 14,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 4,
+          }}
+        />
+      </div>
 
       {/* ── SECTION 1 — HERO (full-bleed background) ── */}
-      <section className="grid-bg" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <section className="grid-bg" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 1 }}>
         {/* Nav */}
         <div className="hero-nav-inner">
           <span style={{
@@ -596,23 +739,8 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                 { num: '8', label: 'Data dimensions', Icon: LayoutGrid },
                 { num: '94.5', label: 'Razorpay Fix My Itch score', Icon: Star },
                 { num: '50,000+', label: 'Indians validated this', Icon: Users },
-              ].map(({ num, label, Icon }) => (
-                <div key={label} style={{ textAlign: 'center' }}>
-                  <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
-                    <Icon size={28} color="#6366F1" strokeWidth={1.5} />
-                  </div>
-                  <div style={{
-                    fontSize: 'clamp(56px, 7vw, 80px)',
-                    fontWeight: 800,
-                    fontFamily: 'var(--font-heading)',
-                    color: 'var(--accent)',
-                    letterSpacing: '-0.03em',
-                    lineHeight: 1
-                  }}>
-                    {num}
-                  </div>
-                  <div style={{ fontSize: 14, color: '#94A3B8', marginTop: 12, letterSpacing: '0.02em' }}>{label}</div>
-                </div>
+              ].map((item, i) => (
+                <AnimatedStat key={item.label} {...item} index={i} />
               ))}
             </div>
 

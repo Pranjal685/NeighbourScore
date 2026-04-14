@@ -1,6 +1,7 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { Autocomplete } from '@react-google-maps/api';
 import { Search, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 function SearchBar({ onSearch, isLoading }) {
   const autocompleteRef = useRef(null);
@@ -55,7 +56,7 @@ function SearchBar({ onSearch, isLoading }) {
         types: ['geocode', 'establishment']
       }}
     >
-      <div style={{
+      <motion.div style={{
         display: 'flex',
         alignItems: 'center',
         background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
@@ -63,9 +64,22 @@ function SearchBar({ onSearch, isLoading }) {
         borderRadius: 16,
         padding: '5px 5px 5px 16px',
         width: '100%',
-        boxShadow: isFocused ? '0 0 0 3px rgba(99,102,241,0.2), 0 8px 32px rgba(99,102,241,0.1)' : '0 8px 32px rgba(99,102,241,0.1), 0 2px 8px rgba(0,0,0,0.06)',
-        transition: 'all 0.25s ease'
-      }}>
+      }}
+      animate={isFocused ? {
+        borderColor: 'rgba(99,102,241,0.5)',
+        boxShadow: [
+          '0 8px 32px rgba(99,102,241,0.1), 0 0 0 0px rgba(99,102,241,0)',
+          '0 8px 32px rgba(99,102,241,0.1), 0 0 0 6px rgba(99,102,241,0.2)',
+          '0 8px 32px rgba(99,102,241,0.1), 0 0 0 10px rgba(99,102,241,0.08)',
+          '0 8px 32px rgba(99,102,241,0.1), 0 0 0 14px rgba(99,102,241,0.03)',
+          '0 8px 32px rgba(99,102,241,0.1), 0 0 0 14px rgba(99,102,241,0)',
+        ]
+      } : {
+        borderColor: 'rgba(255,255,255,0.9)',
+        boxShadow: '0 8px 32px rgba(99,102,241,0.1), 0 2px 8px rgba(0,0,0,0.06)'
+      }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+      >
         <Search size={16} color={isFocused ? '#6366F1' : '#94A3B8'} style={{ flexShrink: 0, transition: 'color 0.2s' }} />
         <input
           type="text"
@@ -113,7 +127,7 @@ function SearchBar({ onSearch, isLoading }) {
           {isLoading && <Loader2 size={14} style={{ animation: 'spin 0.8s linear infinite' }} />}
           {isLoading ? 'Analyzing...' : 'Analyze'}
         </button>
-      </div>
+      </motion.div>
     </Autocomplete>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import { GitCompare, Info, Cpu, MapPin, LayoutGrid, Map } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import ScoreGauge, { getScoreColor, getScoreLabel } from '../components/ScoreGauge';
@@ -68,6 +68,13 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
     }
   };
 
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
@@ -76,9 +83,74 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
       transition={{ duration: 0.5, ease: 'easeOut' }}
       style={{ minHeight: '100vh', background: 'transparent' }}
     >
-      <Navbar onNewSearch={onNewSearch} locality={result.locality} onShare={() => setIsShareModalOpen(true)} />
+      {/* Scroll Progress Bar */}
+      <motion.div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '3px',
+          background: 'linear-gradient(90deg, #6366F1, #8B5CF6, #E6A817)',
+          transformOrigin: '0%',
+          scaleX,
+          zIndex: 100,
+        }}
+      />
 
-      <div className="report-inner">
+      {/* Background Blobs (smaller for Report context) */}
+      <div className="blob-container" style={{ 
+        position: 'fixed', 
+        inset: 0, 
+        overflow: 'hidden', 
+        pointerEvents: 'none',
+        zIndex: 0 
+      }}>
+        {/* Blob 1 */}
+        <motion.div
+          style={{
+            position: 'absolute',
+            width: '400px',
+            height: '400px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)',
+            top: '-100px',
+            left: '-100px',
+            filter: 'blur(40px)',
+          }}
+          animate={{
+            x: [0, 20, -10, 5, 0],
+            y: [0, -10, 20, -5, 0],
+            scale: [1, 1.05, 0.97, 1.03, 1],
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        
+        {/* Blob 2 */}
+        <motion.div
+          style={{
+            position: 'absolute',
+            width: '350px',
+            height: '350px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(230,168,23,0.1) 0%, transparent 70%)',
+            top: '-50px',
+            right: '-100px',
+            filter: 'blur(40px)',
+          }}
+          animate={{
+            x: [0, -15, 10, -5, 0],
+            y: [0, 15, -20, 10, 0],
+            scale: [1, 0.97, 1.05, 0.98, 1],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+        />
+      </div>
+
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <Navbar onNewSearch={onNewSearch} locality={result.locality} onShare={() => setIsShareModalOpen(true)} />
+
+        <div className="report-inner">
 
         {/* ── PART 1: Score Hero ── */}
         <motion.div {...inView} style={{ padding: '56px 0 48px' }}>
@@ -336,7 +408,8 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
         isOpen={isShareModalOpen} 
         onClose={() => setIsShareModalOpen(false)} 
         data={result} 
-      />
+        />
+      </div>
     </motion.div>
   );
 }
