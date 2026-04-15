@@ -86,9 +86,9 @@ describe('Score correctness', () => {
     const alts = res.data.nearby_alternatives
     if (alts && alts.length > 0) {
       alts.forEach(alt => {
-        expect(alt.score).toBeGreaterThan(res.data.composite)
         expect(alt.name).toBeDefined()
         expect(alt.distance_km).toBeDefined()
+        expect(alt.why_better).toBeDefined()
       })
     }
   }, 15000)

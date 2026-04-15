@@ -80,9 +80,9 @@ describe('Stress tests', () => {
     const cachedTime = Date.now() - cachedStart
 
     console.log(`Fresh: ${freshTime}ms, Cached: ${cachedTime}ms, cached flag: ${cached.data.cached}`)
-    // If cached flag is set, it must be faster
+    // If cached flag is set, it must be at least as fast (sub-ms resolution means equal is valid)
     if (cached.data.cached) {
-      expect(cachedTime).toBeLessThan(freshTime)
+      expect(cachedTime).toBeLessThanOrEqual(freshTime)
     }
     // Either way it must succeed
     expect(cached.status).toBe(200)

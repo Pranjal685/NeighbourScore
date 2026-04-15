@@ -3,6 +3,7 @@
 firebase-adminsdk.json
 *.pem
 *.key
+CLAUDE.md
 
 # ── Node.js ───────────────────────────────────────────────────
 node_modules/
@@ -50,4 +51,4 @@ frontend/build/
 *.log
 .cache/
 coverage/
-CLAUDE.md
+
