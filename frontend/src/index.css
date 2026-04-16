@@ -188,6 +188,18 @@ body {
   }
 }
 
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 25%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.06) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
 /* Hero grid — full-bleed background with centered 1200px content */
 .grid-bg {
   /* Removed old dark style, layout logic kept */

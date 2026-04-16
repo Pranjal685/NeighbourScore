@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check } from 'lucide-react';
+import { cleanLocalityName } from '../utils/localityUtils';
 
 function ShareModal({ isOpen, onClose, data }) {
   const [copied, setCopied] = useState(false);
@@ -14,8 +15,9 @@ function ShareModal({ isOpen, onClose, data }) {
     .replace(/\s+/g, '-')
     .substring(0, 50) || 'report';
 
+  const cleanName = cleanLocalityName(data.locality) || data.locality || 'Report';
   const shareUrl = `${window.location.origin}/report/${slug}`;
-  const whatsappText = `Check out the NeighbourScore report for ${data.locality}: ${shareUrl}`;
+  const whatsappText = `Check out the NeighbourScore report for ${cleanName}: ${shareUrl}`;
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
 
   const handleCopy = () => {
@@ -133,7 +135,7 @@ function ShareModal({ isOpen, onClose, data }) {
                 </div>
                 <div>
                   <div style={{ fontSize: 15, fontWeight: 600, color: '#1A1A2E', marginBottom: 4 }}>
-                    {data.locality.split(',')[0]}
+                    {cleanName}
                   </div>
                   <div style={{ fontSize: 12, color: '#64748B' }}>
                     NeighbourScore: {data.composite}/100

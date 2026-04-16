@@ -4,12 +4,14 @@ import { LoadScript } from '@react-google-maps/api';
 import LandingPage from './pages/LandingPage';
 import LoadingScreen from './pages/LoadingScreen';
 import ReportPage from './pages/ReportPage';
+import NotFoundPage from './pages/NotFoundPage';
+import ReportSkeleton from './components/ReportSkeleton';
 import { getScore, getReportBySlug } from './services/api';
 
 const LIBRARIES = ['places'];
 
 function App() {
-  const [appState, setAppState] = useState('search'); // 'search' | 'loading' | 'results'
+  const [appState, setAppState] = useState('search'); // 'search' | 'loading' | 'skeleton' | 'results' | 'notfound'
   const [result, setResult] = useState(null);
   const [location, setLocation] = useState({ lat: null, lng: null, name: '' });
   const [selectedProfile, setSelectedProfile] = useState('general');
@@ -26,13 +28,13 @@ function App() {
             setResult(data);
             setLocation({ lat: null, lng: null, name: data.locality });
             setSelectedProfile(data.profile || 'general');
-            setAppState('results');
+            // Show skeleton briefly before the real report
+            setAppState('skeleton');
+            setTimeout(() => setAppState('results'), 300);
           })
           .catch(err => {
             console.error(err);
-            setError('Report not found or could not be loaded.');
-            setAppState('search');
-            window.history.pushState({}, '', '/');
+            setAppState('notfound');
           });
       }
     }
@@ -50,7 +52,9 @@ function App() {
         new Promise(r => setTimeout(r, 2000)) // minimum 2s loading screen
       ]);
       setResult(data);
-      setAppState('results');
+      // Show skeleton briefly to prevent white flash
+      setAppState('skeleton');
+      setTimeout(() => setAppState('results'), 300);
     } catch (err) {
       console.error('Score fetch failed:', err);
       setError('Failed to analyze this locality. Please try again.');
@@ -83,6 +87,9 @@ function App() {
         {appState === 'loading' && (
           <LoadingScreen key="loading" localityName={location.name} />
         )}
+        {appState === 'skeleton' && (
+          <ReportSkeleton key="skeleton" />
+        )}
         {appState === 'results' && result && (
           <ReportPage
             key="results"
@@ -93,6 +100,9 @@ function App() {
             profile={selectedProfile}
             onSearch={handleSearch}
           />
+        )}
+        {appState === 'notfound' && (
+          <NotFoundPage key="notfound" onGoHome={handleNewSearch} />
         )}
       </AnimatePresence>
     </LoadScript>

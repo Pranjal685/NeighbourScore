@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cleanLocalityName } from '../utils/localityUtils';
 
 const ROWS = [
   { emoji: '🌬️', source: 'CPCB Air Quality API',      fetching: 'Querying monitoring stations...', result: 'AQI 87 · Moderate' },
@@ -27,7 +28,7 @@ function LoadingScreen({ localityName }) {
     return () => { timers.forEach(clearTimeout); clearTimeout(finalTimer); };
   }, []);
 
-  const shortName = (localityName || 'Your locality').split(',')[0].trim();
+  const shortName = cleanLocalityName(localityName) || 'Your locality';
 
   return (
     <motion.div

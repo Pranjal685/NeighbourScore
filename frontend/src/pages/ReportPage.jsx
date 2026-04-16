@@ -3,6 +3,7 @@ import { motion, useScroll, useSpring } from 'framer-motion';
 import { GitCompare, Info, Cpu, MapPin, LayoutGrid, Map } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import ScoreGauge, { getScoreColor, getScoreLabel } from '../components/ScoreGauge';
+import { cleanLocalityName } from '../utils/localityUtils';
 import DimensionGrid from '../components/DimensionGrid';
 import NeighbourRadarChart from '../components/RadarChart';
 import MapView from '../components/MapView';
@@ -49,6 +50,7 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
   const scoreColor = getScoreColor(composite);
   const scoreLabel = getScoreLabel(composite);
   const localityShort = (result.locality || '').split(',')[0].trim();
+  const cleanLocality = cleanLocalityName(result.locality);
   const timestamp = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 
   // Geocode a locality name and trigger a new search
@@ -174,7 +176,7 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
                 gap: 12
               }}>
                 <MapPin size={28} color="#6366F1" strokeWidth={1.5} />
-                {result.locality}
+                {cleanLocality}
               </h1>
               <p style={{ fontSize: 14, color: '#64748B', marginBottom: profileMeta ? 12 : 32 }}>
                 Pune District, Maharashtra &nbsp;·&nbsp; analyzed with verified government data

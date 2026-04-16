@@ -1,11 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Search, Share2, ChevronRight } from 'lucide-react';
+import { cleanLocalityName } from '../utils/localityUtils';
 
 function Navbar({ onNewSearch, locality, onShare }) {
-  const parts = locality ? locality.split(',').map(p => p.trim()) : [];
-  const city = parts.length > 1 ? parts[parts.length - 2] || 'Pune' : 'Pune';
-  const area = parts[0] || '';
+  const cleanName = cleanLocalityName(locality);
+  const nameParts = cleanName.split(',').map(p => p.trim());
+  const area = nameParts[0] || '';
+  const city = nameParts[1] || 'Pune';
 
   const handleShare = () => {
     if (onShare) {
