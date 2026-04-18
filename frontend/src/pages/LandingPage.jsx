@@ -142,7 +142,7 @@ function AnimatedStat({ num, label, Icon, index }) {
   );
 }
 
-function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
+function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMethodology }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = (lat, lng, name) => {
@@ -819,8 +819,20 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange }) {
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Shield size={12} strokeWidth={1.5} color="#94A3B8" /> NCRB</span> ·
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Map size={12} strokeWidth={1.5} color="#94A3B8" /> Google Maps</span>
                 </p>
-                <p style={{ fontSize: 11, color: 'rgba(26,26,46,0.3)', marginTop: 8 }}>
-                  NeighbourScore · Google Solution Challenge 2026
+                <p style={{ fontSize: 12, color: 'rgba(26,26,46,0.4)', marginTop: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+                  <span>NeighbourScore · Google Solution Challenge 2026</span>
+                  {onGoMethodology && (
+                    <button
+                      onClick={onGoMethodology}
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        color: '#6366F1', fontSize: 12, fontFamily: 'var(--font-body)',
+                        fontWeight: 500, padding: 0,
+                      }}
+                    >
+                      How we calculate scores →
+                    </button>
+                  )}
                 </p>
               </div>
             </div>

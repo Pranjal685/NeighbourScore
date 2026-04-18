@@ -46,6 +46,10 @@ function NearbyAlternatives({ alternatives, onSearch }) {
               }
             }}
             onClick={() => onSearch && onSearch(alt.name + ', Pune')}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSearch && onSearch(alt.name + ', Pune'); } }}
+            role="button"
+            tabIndex={0}
+            aria-label={`Analyze ${alt.name}, ${alt.distance_km}km away — ${alt.why_better}`}
             className="glass-card"
             style={{
               borderRadius: 12,

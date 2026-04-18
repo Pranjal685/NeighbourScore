@@ -50,6 +50,8 @@ function ProfileSelector({ selectedProfile, onProfileChange }) {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              aria-pressed={isSelected}
+              aria-label={`${p.title} profile — ${p.subtitle}`}
               style={{
                 background: isSelected ? 'rgba(99,102,241,0.1)' : 'rgba(255,255,255,0.5)',
                 backdropFilter: 'blur(16px)',

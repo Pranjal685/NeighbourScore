@@ -5,6 +5,12 @@ import { Search, Loader2, Trophy, TrendingUp, TrendingDown, Minus } from 'lucide
 import { getScore } from '../services/api';
 import NeighbourRadarChart from './RadarChart';
 
+function safeGtag(...args) {
+  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+    window.gtag(...args);
+  }
+}
+
 const COMPARE_DIMENSIONS = [
   { key: 'air_quality', label: 'Air Quality' },
   { key: 'school_quality', label: 'Schools' },
@@ -53,6 +59,10 @@ function CompareMode({ firstResult, profile = 'general' }) {
           new Promise(r => setTimeout(r, 1000))
         ]);
         setSecondResult(data);
+        safeGtag('event', 'localities_compared', {
+          locality_1: firstResult?.locality || '',
+          locality_2: name,
+        });
       } catch (err) {
         console.error('Compare failed:', err);
       } finally {

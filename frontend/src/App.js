@@ -6,12 +6,13 @@ import LoadingScreen from './pages/LoadingScreen';
 import ReportPage from './pages/ReportPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ReportSkeleton from './components/ReportSkeleton';
+import MethodologyPage from './pages/MethodologyPage';
 import { getScore, getReportBySlug } from './services/api';
 
 const LIBRARIES = ['places'];
 
 function App() {
-  const [appState, setAppState] = useState('search'); // 'search' | 'loading' | 'skeleton' | 'results' | 'notfound'
+  const [appState, setAppState] = useState('search'); // 'search' | 'loading' | 'skeleton' | 'results' | 'notfound' | 'methodology'
   const [result, setResult] = useState(null);
   const [location, setLocation] = useState({ lat: null, lng: null, name: '' });
   const [selectedProfile, setSelectedProfile] = useState('general');
@@ -19,7 +20,9 @@ function App() {
 
   useEffect(() => {
     const path = window.location.pathname;
-    if (path.startsWith('/report/')) {
+    if (path === '/methodology') {
+      setAppState('methodology');
+    } else if (path.startsWith('/report/')) {
       const slug = path.split('/report/')[1];
       if (slug) {
         setAppState('loading');
@@ -28,7 +31,6 @@ function App() {
             setResult(data);
             setLocation({ lat: null, lng: null, name: data.locality });
             setSelectedProfile(data.profile || 'general');
-            // Show skeleton briefly before the real report
             setAppState('skeleton');
             setTimeout(() => setAppState('results'), 300);
           })
@@ -69,6 +71,18 @@ function App() {
     setError(null);
   };
 
+  const handleGoMethodology = () => {
+    window.history.pushState({}, '', '/methodology');
+    setAppState('methodology');
+  };
+
+  const handleGoHome = () => {
+    window.history.pushState({}, '', '/');
+    setAppState('search');
+    setResult(null);
+    setError(null);
+  };
+
   return (
     <LoadScript
       googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
@@ -82,6 +96,7 @@ function App() {
             error={error}
             selectedProfile={selectedProfile}
             onProfileChange={setSelectedProfile}
+            onGoMethodology={handleGoMethodology}
           />
         )}
         {appState === 'loading' && (
@@ -99,10 +114,14 @@ function App() {
             onNewSearch={handleNewSearch}
             profile={selectedProfile}
             onSearch={handleSearch}
+            onGoMethodology={handleGoMethodology}
           />
         )}
         {appState === 'notfound' && (
           <NotFoundPage key="notfound" onGoHome={handleNewSearch} />
+        )}
+        {appState === 'methodology' && (
+          <MethodologyPage key="methodology" onGoHome={handleGoHome} />
         )}
       </AnimatePresence>
     </LoadScript>

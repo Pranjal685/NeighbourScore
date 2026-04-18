@@ -2,6 +2,12 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { GoogleMap, Polygon, OverlayView } from '@react-google-maps/api';
 import puneLocalities from '../data/pune_localities.json';
 
+function safeGtag(...args) {
+  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+    window.gtag(...args);
+  }
+}
+
 // ─── Map styles: clean light theme so polygons pop ───────────────────────────
 const MAP_STYLES = [
   { featureType: 'poi', stylers: [{ visibility: 'off' }] },
@@ -333,6 +339,10 @@ function HeatMap({ onLocalityClick }) {
 
   const handleAnalyze = useCallback((feature) => {
     const center = getPolygonCenter(feature.geometry.coordinates);
+    safeGtag('event', 'heatmap_click', {
+      locality_name: feature.properties.name,
+      score: feature.properties.score,
+    });
     onLocalityClick({
       ...feature.properties,
       lat: center.lat,

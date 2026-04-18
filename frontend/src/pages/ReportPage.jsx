@@ -41,7 +41,7 @@ const PROFILE_META = {
   investor: { label: 'Investor', icon: '🏠' },
 };
 
-function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
+function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch, onGoMethodology }) {
   const [showCompare, setShowCompare] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const activeProfile = result.profile || profile || 'general';
@@ -232,6 +232,19 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch }) {
                     }}>
                       {scoreLabel} Neighborhood
                     </span>
+                    {onGoMethodology && (
+                      <button
+                        onClick={onGoMethodology}
+                        style={{
+                          display: 'block', marginTop: 10,
+                          background: 'none', border: 'none', cursor: 'pointer',
+                          color: '#94A3B8', fontSize: 11, fontFamily: 'var(--font-body)',
+                          padding: 0, textDecoration: 'underline',
+                        }}
+                      >
+                        How scores are calculated →
+                      </button>
+                    )}
                   </motion.div>
                 </div>
               </div>

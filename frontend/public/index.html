@@ -27,13 +27,30 @@
     <meta name="twitter:description" content="8-dimension AI report card for any Pune locality. Built from CPCB, CBSE, NDMA, and NCRB government data." />
     <meta name="twitter:image" content="https://neighbourscore.web.app/og-image.png" />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" sizes="any" />
+    <!-- Favicon — SVG first so modern browsers pick it up; ico as legacy fallback -->
+    <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+    <!-- Google Analytics GA4 -->
+    <!-- REACT_APP_GA_MEASUREMENT_ID is substituted by CRA at build time.
+         In development without the env var, gtag calls are no-ops via the safeGtag wrapper in JS. -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=%REACT_APP_GA_MEASUREMENT_ID%"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '%REACT_APP_GA_MEASUREMENT_ID%');
+    </script>
   </head>
   <body>
+    <!-- Skip to main content — visible only when focused via keyboard -->
+    <a
+      href="#main-content"
+      style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;"
+      onfocus="this.style.left='16px';this.style.top='16px';this.style.width='auto';this.style.height='auto';this.style.overflow='visible';this.style.zIndex='9999';this.style.padding='10px 20px';this.style.background='#6366F1';this.style.color='#fff';this.style.borderRadius='8px';this.style.fontFamily='system-ui,sans-serif';this.style.fontWeight='600';this.style.textDecoration='none';"
+      onblur="this.style.left='-9999px';"
+    >Skip to main content</a>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
   </body>

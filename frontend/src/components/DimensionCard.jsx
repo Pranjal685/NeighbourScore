@@ -65,6 +65,14 @@ function ExpandChevron({ isExpanded, color }) {
 
 // ─── Shared Modal Wrapper ────────────────────────────────────────────────────────
 function EvidenceModal({ isExpanded, setIsExpanded, dimensionKey, name, color, raw, displayScore }) {
+  // Escape key closes modal
+  React.useEffect(() => {
+    if (!isExpanded) return;
+    const handler = (e) => { if (e.key === 'Escape') setIsExpanded(false); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isExpanded, setIsExpanded]);
+
   if (typeof document === 'undefined') return null;
 
   return createPortal(
@@ -150,6 +158,11 @@ export function Tier1Card({ dimensionKey, name, score, weight, narrative, raw, i
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay: index * 0.08, ease: [0.25, 0.4, 0.25, 1] }}
       onClick={() => setIsExpanded(!isExpanded)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsExpanded(!isExpanded); } }}
+      role="button"
+      tabIndex={0}
+      aria-expanded={isExpanded}
+      aria-label={`${name}, score ${displayScore} out of 100. Press to see details.`}
       className="glass-card"
       style={{
         borderTop: `3px solid ${color}`,
@@ -246,6 +259,11 @@ export function Tier2Card({ dimensionKey, name, score, weight, narrative, raw, i
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay: index * 0.08, ease: [0.25, 0.4, 0.25, 1] }}
       onClick={() => setIsExpanded(!isExpanded)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsExpanded(!isExpanded); } }}
+      role="button"
+      tabIndex={0}
+      aria-expanded={isExpanded}
+      aria-label={`${name}, score ${displayScore} out of 100. Press to see details.`}
       className="glass-card"
       style={{
         borderLeft: `3px solid ${color}`,
@@ -328,6 +346,11 @@ export function Tier3Card({ dimensionKey, name, score, weight, narrative, raw, i
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay: index * 0.08, ease: [0.25, 0.4, 0.25, 1] }}
       onClick={() => setIsExpanded(!isExpanded)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsExpanded(!isExpanded); } }}
+      role="button"
+      tabIndex={0}
+      aria-expanded={isExpanded}
+      aria-label={`${name}, score ${displayScore} out of 100. Press to see details.`}
       className="glass-card"
       style={{
         borderRadius: 12,
