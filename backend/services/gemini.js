@@ -112,15 +112,26 @@ Respond with ONLY the narrative text, no JSON, no labels.`;
   try {
     return await tryGenerate();
   } catch (err) {
-    // Retry once on 429 rate limit
-    if (err.status === 429 || (err.message && err.message.includes('429'))) {
-      await new Promise(r => setTimeout(r, 1000));
-      try {
-        return await tryGenerate();
-      } catch (retryErr) {
-        console.warn(`Gemini retry failed for ${dimensionKey}:`, retryErr.message);
-        return null;
+    const is429 = err.status === 429 || (err.message && err.message.includes('429'));
+    if (is429) {
+      // Check if it's a daily quota (retryDelay hint > 30s) — not worth retrying
+      const retryDelayMatch = err.message && err.message.match(/"retryDelay":"(\d+)s"/);
+      const retryDelaySecs = retryDelayMatch ? parseInt(retryDelayMatch[1]) : 0;
+      const isLongWait = retryDelaySecs > 30;
+
+      if (!isLongWait) {
+        // Per-minute rate limit — short delay, worth retrying once
+        await new Promise(r => setTimeout(r, 1000));
+        try {
+          return await tryGenerate();
+        } catch (retryErr) {
+          console.warn(`Gemini retry failed for ${dimensionKey}:`, retryErr.message);
+          return null;
+        }
       }
+      // Daily quota exhausted — use fallback immediately
+      console.warn(`Gemini quota exhausted for ${dimensionKey} (retry in ${retryDelaySecs}s), using fallback`);
+      return null;
     }
     console.warn(`Gemini failed for ${dimensionKey}:`, err.message);
     return null;

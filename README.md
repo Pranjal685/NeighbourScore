@@ -38,7 +38,7 @@ NeighbourScore gives Indian homebuyers an **8-dimension report card** for any Pu
 
 ## Live Demo
 
-🌐 **Live App** — *(link after deployment)*
+🌐 **Live App** — https://neighbourscore-492917.web.app
 
 **Localities to try:**
 - `Koregaon Park` — Premium central Pune (scores ~80/100)
@@ -141,7 +141,7 @@ React Frontend (Firebase Hosting)
   • Glassmorphism + Minimalism UI
      │
      ▼
-Node.js + Express Backend (Railway)
+Node.js + Express Backend (Google Cloud Run)
      │
      ├──► CPCB API ──────────── Live AQI, Maharashtra filter
      ├──► Google Maps Places ── Hospitals, transit, parks
@@ -176,7 +176,7 @@ Node.js + Express Backend (Railway)
 | News | GNews API (Pune crime headlines) |
 | Security | express-rate-limit + input validation |
 | Testing | Jest + Axios |
-| Hosting | Firebase Hosting + Railway |
+| Hosting | Firebase Hosting + Google Cloud Run |
 
 ---
 
@@ -219,7 +219,7 @@ hardcore_stress.test.js 31/31 15 locality validation, 16 head-to-head
 | User Experience | 10% | Glassmorphism UI, 8 animations, compare mode, profile personalisation, mobile responsive |
 
 **Mandate compliance:**
-- ✅ Cloud deployed (Firebase Hosting + Railway)
+- ✅ Cloud deployed (Firebase Hosting + Google Cloud Run, asia-south1 Mumbai)
 - ✅ Uses Google AI (Gemini 1.5 Flash for narratives and property search)
 
 ---

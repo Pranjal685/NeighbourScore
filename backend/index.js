@@ -9,13 +9,23 @@ const reportRouter = require('./routes/report');
 
 const app = express();
 
+// Trust Cloud Run's reverse proxy — required for correct IP detection and
+// express-rate-limit to work properly behind Google's load balancer.
+app.set('trust proxy', 1);
+
 // Middleware
-// TODO: restrict origin to Firebase Hosting domain after deployment
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://neighbourscore-492917.web.app',
+    'https://neighbourscore-492917.firebaseapp.com'
+  ]
+}));
 app.use(express.json());
 
 // Rate limiter — 20 requests per IP per minute on /api/score.
 // Localhost is exempt so that the dev server and test suite are not throttled.
+// validate:false disables the X-Forwarded-For warning (handled by trust proxy above).
 const scoreLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 20,
@@ -26,6 +36,7 @@ const scoreLimiter = rateLimit({
   message: { error: 'Too many requests. Please wait a minute.' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
 });
 
 // Health check
