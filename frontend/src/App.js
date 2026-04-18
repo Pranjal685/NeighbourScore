@@ -12,7 +12,7 @@ import { getScore, getReportBySlug } from './services/api';
 const LIBRARIES = ['places'];
 
 function App() {
-  const [appState, setAppState] = useState('search'); // 'search' | 'loading' | 'skeleton' | 'results' | 'notfound' | 'methodology'
+  const [appState, setAppState] = useState('search'); // 'search'|'loading'|'skeleton'|'results'|'error'|'notfound'|'methodology'
   const [result, setResult] = useState(null);
   const [location, setLocation] = useState({ lat: null, lng: null, name: '' });
   const [selectedProfile, setSelectedProfile] = useState('general');
@@ -51,16 +51,21 @@ function App() {
     try {
       const [data] = await Promise.all([
         getScore(lat, lng, name, activeProfile),
-        new Promise(r => setTimeout(r, 2000)) // minimum 2s loading screen
+        new Promise(r => setTimeout(r, 1500)) // minimum 1.5s loading screen
       ]);
+
+      // Validate we got a real response with dimensions
+      if (!data || !data.composite || !data.dimensions) {
+        throw new Error('Invalid response from server. Please try again.');
+      }
+
       setResult(data);
-      // Show skeleton briefly to prevent white flash
       setAppState('skeleton');
       setTimeout(() => setAppState('results'), 300);
     } catch (err) {
       console.error('Score fetch failed:', err);
-      setError('Failed to analyze this locality. Please try again.');
-      setAppState('search');
+      setError(err.message || 'Failed to analyze this locality. Please try again.');
+      setAppState('error');
     }
   };
 
@@ -104,6 +109,59 @@ function App() {
         )}
         {appState === 'skeleton' && (
           <ReportSkeleton key="skeleton" />
+        )}
+        {appState === 'error' && (
+          <div key="error" style={{
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'linear-gradient(135deg, #eef0ff 0%, #f8f4ff 100%)',
+            gap: 24,
+            padding: 32,
+            textAlign: 'center',
+          }}>
+            <div style={{ fontSize: 48 }}>⚠️</div>
+            <h2 style={{ fontFamily: 'var(--font-heading)', color: '#1A1A2E', margin: 0 }}>
+              Analysis Failed
+            </h2>
+            <p style={{ color: '#555', maxWidth: 420, lineHeight: 1.6, margin: 0 }}>
+              {error || 'Something went wrong. The server may be starting up.'}
+            </p>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button
+                onClick={() => handleSearch(location.lat, location.lng, location.name, selectedProfile)}
+                style={{
+                  padding: '12px 28px',
+                  background: '#6366F1',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 10,
+                  fontWeight: 700,
+                  fontSize: 15,
+                  cursor: 'pointer',
+                }}
+              >
+                🔄 Retry
+              </button>
+              <button
+                onClick={handleNewSearch}
+                style={{
+                  padding: '12px 28px',
+                  background: 'rgba(99,102,241,0.1)',
+                  color: '#6366F1',
+                  border: '1.5px solid #6366F1',
+                  borderRadius: 10,
+                  fontWeight: 700,
+                  fontSize: 15,
+                  cursor: 'pointer',
+                }}
+              >
+                ← New Search
+              </button>
+            </div>
+          </div>
         )}
         {appState === 'results' && result && (
           <ReportPage

@@ -61,19 +61,34 @@ function getWeights(profile) {
 }
 
 /**
+ * Wrap a promise with a timeout — if it doesn't resolve in time, returns fallback value.
+ */
+function withTimeout(promise, ms, fallback) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`timed out after ${ms}ms`)), ms)
+    ),
+  ]).catch(() => fallback);
+}
+
+/**
  * Run the full scoring pipeline for a given lat/lng.
  */
 async function runScoringPipeline(lat, lng, locality_name, profile = 'general') {
-  // Call all 8 services in parallel — allSettled so one failure doesn't crash others
+  const T = 22000; // 22s per service timeout
+
+  // Call all 8 services in parallel wrapped with individual timeouts
+  // allSettled ensures one failure/timeout doesn't cancel others
   const results = await Promise.allSettled([
-    getAqiScore(lat, lng, locality_name),
-    getSchoolScore(lat, lng, locality_name),
-    getFloodScore(lat, lng),
-    getHealthcareScore(lat, lng, locality_name),
-    getCrimeScore(lat, lng, locality_name),  // now accepts localityName for news
-    getTransportScore(lat, lng, locality_name),
-    getGreeneryScore(lat, lng, locality_name),
-    getPropertyScore(lat, lng, locality_name),
+    withTimeout(getAqiScore(lat, lng, locality_name), T, { score: FALLBACK_SCORES.air_quality, raw: { timeout: true } }),
+    withTimeout(getSchoolScore(lat, lng, locality_name), T, { score: FALLBACK_SCORES.school_quality, raw: { timeout: true } }),
+    withTimeout(getFloodScore(lat, lng), T, { score: FALLBACK_SCORES.flood_risk, raw: { timeout: true } }),
+    withTimeout(getHealthcareScore(lat, lng, locality_name), T, { score: FALLBACK_SCORES.healthcare, raw: { timeout: true } }),
+    withTimeout(getCrimeScore(lat, lng, locality_name), T, { score: FALLBACK_SCORES.crime_safety, raw: { timeout: true } }),
+    withTimeout(getTransportScore(lat, lng, locality_name), T, { score: FALLBACK_SCORES.transport, raw: { timeout: true } }),
+    withTimeout(getGreeneryScore(lat, lng, locality_name), T, { score: FALLBACK_SCORES.greenery, raw: { timeout: true } }),
+    withTimeout(getPropertyScore(lat, lng, locality_name), T, { score: FALLBACK_SCORES.property_value, raw: { timeout: true } }),
   ]);
 
   const keys = [
