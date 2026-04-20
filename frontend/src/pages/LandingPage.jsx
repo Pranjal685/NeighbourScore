@@ -11,9 +11,15 @@ import SearchBar from '../components/SearchBar';
 import ProfileSelector from '../components/ProfileSelector';
 import HeatMap from '../components/HeatMap';
 
-const SAMPLE_AREAS = ['Wakad', 'Baner', 'Kothrud', 'Hinjewadi', 'Koregaon Park'];
+const SAMPLE_AREAS = [
+  { name: 'Wakad', lat: 18.5987, lng: 73.7686, address: 'Wakad, Pimpri-Chinchwad, Maharashtra, India' },
+  { name: 'Baner', lat: 18.5590, lng: 73.7868, address: 'Baner, Pune, Maharashtra, India' },
+  { name: 'Kothrud', lat: 18.5074, lng: 73.8077, address: 'Kothrud, Pune, Maharashtra, India' },
+  { name: 'Hinjewadi', lat: 18.5913, lng: 73.7389, address: 'Hinjawadi, Pune, Maharashtra, India' },
+  { name: 'Koregaon Park', lat: 18.5362, lng: 73.8930, address: 'Koregaon Park, Pune, Maharashtra, India' }
+];
 
-// Static preview data — hardcoded Baner sample, no API call
+// ... (keep static preview data)
 const PREVIEW_DIMS = [
   { label: 'School Quality', emoji: '🏫', score: 80 },
   { label: 'Air Quality', emoji: '🌬️', score: 100 },
@@ -155,18 +161,11 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMe
     onSearch(lat, lng, name, selectedProfile);
   };
 
-  const handleChipClick = (areaName) => {
-    if (!window.google) return;
+  const handleChipClick = (area) => {
     setIsLoading(true);
-    const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode({ address: `${areaName}, Pune, Maharashtra, India` }, (results, status) => {
-      if (status === 'OK' && results[0]) {
-        const loc = results[0].geometry.location;
-        onSearch(loc.lat(), loc.lng(), results[0].formatted_address, selectedProfile);
-      } else {
-        setIsLoading(false);
-      }
-    });
+    // Directly use the hardcoded coordinates to completely bypass Geocoder API
+    // which may be failing or restricted in production
+    onSearch(area.lat, area.lng, area.address, selectedProfile);
   };
 
   return (
@@ -383,7 +382,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMe
                   <span style={{ fontSize: 12, color: '#64748B' }}>Try:</span>
                   {SAMPLE_AREAS.map(area => (
                     <button
-                      key={area}
+                      key={area.name}
                       onClick={() => handleChipClick(area)}
                       className="glass-chip"
                       style={{
@@ -402,7 +401,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMe
                         e.currentTarget.style.color = '#64748B';
                       }}
                     >
-                      {area}
+                      {area.name}
                     </button>
                   ))}
                 </motion.div>

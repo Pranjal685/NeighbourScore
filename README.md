@@ -411,8 +411,8 @@ NeighbourScore/
 
 | Name | Role |
 |---|---|
-| Pranjal Sahu | Full Stack Development, Data Engineering, Product |
-|  | [Role] |
+| Pranjal Sahu | Backend Development, AI Integration & Data Engineering |
+| Shreem Verma |  UI/UX Design & Frontend Development |
 
 ---
 

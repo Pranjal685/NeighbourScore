@@ -1,4 +1,4 @@
-const CACHE_NAME = 'neighbourscore-v2';
+const CACHE_NAME = 'neighbourscore-v4';
 const urlsToCache = ['/', '/index.html'];
 
 self.addEventListener('install', event => {
