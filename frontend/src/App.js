@@ -31,8 +31,7 @@ function App() {
             setResult(data);
             setLocation({ lat: null, lng: null, name: data.locality });
             setSelectedProfile(data.profile || 'general');
-            setAppState('skeleton');
-            setTimeout(() => setAppState('results'), 300);
+            setAppState('results');
           })
           .catch(err => {
             console.error(err);
@@ -60,8 +59,7 @@ function App() {
       }
 
       setResult(data);
-      setAppState('skeleton');
-      setTimeout(() => setAppState('results'), 300);
+      setAppState('results');
     } catch (err) {
       console.error('Score fetch failed:', err);
       setError(err.message || 'Failed to analyze this locality. Please try again.');
@@ -106,9 +104,6 @@ function App() {
         )}
         {appState === 'loading' && (
           <LoadingScreen key="loading" localityName={location.name} />
-        )}
-        {appState === 'skeleton' && (
-          <ReportSkeleton key="skeleton" />
         )}
         {appState === 'error' && (
           <div key="error" style={{

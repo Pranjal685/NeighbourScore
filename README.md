@@ -412,7 +412,7 @@ NeighbourScore/
 | Name | Role |
 |---|---|
 | Pranjal Sahu | Full Stack Development, Data Engineering, Product |
-| Teammate | [Role] |
+|  | [Role] |
 
 ---
 
