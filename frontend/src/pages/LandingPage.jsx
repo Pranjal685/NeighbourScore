@@ -739,10 +739,7 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMe
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.45, delay: i * 0.07 }}
-                className="glass-card"
-                style={{
-                  padding: '28px'
-                }}
+                className="glass-card p-3 md:p-7"
               >
                 <div style={{
                   width: 40,

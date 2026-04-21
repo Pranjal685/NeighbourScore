@@ -519,8 +519,17 @@ body {
     margin-left: -16px;
   }
 
+  .grid-bg {
+    overflow-x: hidden;
+  }
+
   .hero-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* Prevent grid children from exceeding the 1fr track width */
+  .hero-grid > * {
+    min-width: 0;
   }
 
   .problem-grid {
