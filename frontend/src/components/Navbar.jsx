@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, Share2, ChevronRight } from 'lucide-react';
+import { Search, Share2, ChevronRight, Trophy } from 'lucide-react';
 import { cleanLocalityName } from '../utils/localityUtils';
 
-function Navbar({ onNewSearch, locality, onShare }) {
+function Navbar({ onNewSearch, locality, onShare, onGoLeaderboard }) {
   const cleanName = cleanLocalityName(locality);
   const nameParts = cleanName.split(',').map(p => p.trim());
   const area = nameParts[0] || '';
@@ -61,6 +61,25 @@ function Navbar({ onNewSearch, locality, onShare }) {
 
       {/* Right actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {onGoLeaderboard && (
+          <button
+            onClick={onGoLeaderboard}
+            className="glass-chip"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 5,
+              color: '#6366F1', fontSize: 12, fontWeight: 600,
+              padding: '7px 13px', cursor: 'pointer',
+              fontFamily: 'var(--font-body)', minHeight: 34,
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.2)'; }}
+            title="Leaderboard"
+          >
+            <Trophy size={13} strokeWidth={2} />
+            <span className="nav-search-text">Leaderboard</span>
+          </button>
+        )}
         <button
           onClick={handleShare}
           className="glass-chip"

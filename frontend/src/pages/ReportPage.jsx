@@ -41,7 +41,7 @@ const PROFILE_META = {
   investor: { label: 'Investor', icon: '🏠' },
 };
 
-function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch, onGoMethodology }) {
+function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch, onGoMethodology, onGoLeaderboard }) {
   const [showCompare, setShowCompare] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const activeProfile = result.profile || profile || 'general';
@@ -150,7 +150,7 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch, onGoMeth
       </div>
 
       <div style={{ position: 'relative', zIndex: 1 }}>
-        <Navbar onNewSearch={onNewSearch} locality={result.locality} onShare={() => setIsShareModalOpen(true)} />
+        <Navbar onNewSearch={onNewSearch} locality={result.locality} onShare={() => setIsShareModalOpen(true)} onGoLeaderboard={onGoLeaderboard} />
 
         <div className="report-inner">
 

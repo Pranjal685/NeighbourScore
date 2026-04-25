@@ -7,12 +7,13 @@ import ReportPage from './pages/ReportPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ReportSkeleton from './components/ReportSkeleton';
 import MethodologyPage from './pages/MethodologyPage';
+import LeaderboardPage from './pages/LeaderboardPage';
 import { getScore, getReportBySlug } from './services/api';
 
 const LIBRARIES = ['places'];
 
 function App() {
-  const [appState, setAppState] = useState('search'); // 'search'|'loading'|'skeleton'|'results'|'error'|'notfound'|'methodology'
+  const [appState, setAppState] = useState('search'); // 'search'|'loading'|'skeleton'|'results'|'error'|'notfound'|'methodology'|'leaderboard'
   const [result, setResult] = useState(null);
   const [location, setLocation] = useState({ lat: null, lng: null, name: '' });
   const [selectedProfile, setSelectedProfile] = useState('general');
@@ -20,7 +21,9 @@ function App() {
 
   useEffect(() => {
     const path = window.location.pathname;
-    if (path === '/methodology') {
+    if (path === '/leaderboard') {
+      setAppState('leaderboard');
+    } else if (path === '/methodology') {
       setAppState('methodology');
     } else if (path.startsWith('/report/')) {
       const slug = path.split('/report/')[1];
@@ -79,6 +82,11 @@ function App() {
     setAppState('methodology');
   };
 
+  const handleGoLeaderboard = () => {
+    window.history.pushState({}, '', '/leaderboard');
+    setAppState('leaderboard');
+  };
+
   const handleGoHome = () => {
     window.history.pushState({}, '', '/');
     setAppState('search');
@@ -100,6 +108,7 @@ function App() {
             selectedProfile={selectedProfile}
             onProfileChange={setSelectedProfile}
             onGoMethodology={handleGoMethodology}
+            onGoLeaderboard={handleGoLeaderboard}
           />
         )}
         {appState === 'loading' && (
@@ -168,6 +177,14 @@ function App() {
             profile={selectedProfile}
             onSearch={handleSearch}
             onGoMethodology={handleGoMethodology}
+            onGoLeaderboard={handleGoLeaderboard}
+          />
+        )}
+        {appState === 'leaderboard' && (
+          <LeaderboardPage
+            key="leaderboard"
+            onSearch={handleSearch}
+            onGoHome={handleGoHome}
           />
         )}
         {appState === 'notfound' && (

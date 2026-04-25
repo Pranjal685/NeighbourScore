@@ -729,3 +729,21 @@ body {
     font-size: 11px;
   }
 }
+
+/* ─── Leaderboard page ──────────────────────────────────────────────────── */
+
+.leaderboard-header {
+  display: grid;
+  grid-template-columns: 56px 1fr 80px 160px 110px 120px;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .lb-hide-mobile {
+    display: none !important;
+  }
+
+  .leaderboard-header {
+    grid-template-columns: 44px 1fr 62px 104px;
+  }
+}

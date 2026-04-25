@@ -148,7 +148,7 @@ function AnimatedStat({ num, label, Icon, index }) {
   );
 }
 
-function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMethodology }) {
+function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMethodology, onGoLeaderboard }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = (lat, lng, name) => {
@@ -267,22 +267,44 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMe
           }}>
             <span style={{ color: 'var(--accent)' }}>N</span>eighbourScore
           </span>
-          <span style={{
-            background: 'var(--accent-soft)',
-            color: 'var(--accent)',
-            fontSize: 12,
-            fontWeight: 500,
-            padding: '5px 12px',
-            borderRadius: 100,
-            border: '1px solid var(--accent-border)',
-            whiteSpace: 'nowrap',
-            flexShrink: 1,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            maxWidth: '50vw'
-          }}>
-            Google Solution Challenge 2026
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 1, minWidth: 0 }}>
+            {onGoLeaderboard && (
+              <button
+                onClick={onGoLeaderboard}
+                style={{
+                  cursor: 'pointer',
+                  color: '#6366F1', fontSize: 13, fontFamily: 'var(--font-body)',
+                  fontWeight: 600, padding: '5px 12px',
+                  borderRadius: 100,
+                  background: 'rgba(99,102,241,0.08)',
+                  border: '1px solid rgba(99,102,241,0.20)',
+                  whiteSpace: 'nowrap',
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  transition: 'all 0.15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.15)'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.35)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.08)'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.20)'; }}
+              >
+                🏆 Leaderboard
+              </button>
+            )}
+            <span style={{
+              background: 'rgba(99,102,241,0.08)',
+              color: '#6366F1',
+              fontSize: 12,
+              fontWeight: 500,
+              padding: '5px 12px',
+              borderRadius: 100,
+              border: '1px solid rgba(99,102,241,0.20)',
+              whiteSpace: 'nowrap',
+              flexShrink: 1,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              maxWidth: '40vw'
+            }}>
+              Google Solution Challenge 2026
+            </span>
+          </div>
         </div>
 
         {/* Hero content */}
