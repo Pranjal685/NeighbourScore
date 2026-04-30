@@ -4,7 +4,6 @@ import LandingPage from './pages/LandingPage';
 import LoadingScreen from './pages/LoadingScreen';
 import ReportPage from './pages/ReportPage';
 import NotFoundPage from './pages/NotFoundPage';
-import ReportSkeleton from './components/ReportSkeleton';
 import MethodologyPage from './pages/MethodologyPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import { getScore, getReportBySlug } from './services/api';
