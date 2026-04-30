@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { LoadScript } from '@react-google-maps/api';
 import LandingPage from './pages/LandingPage';
 import LoadingScreen from './pages/LoadingScreen';
 import ReportPage from './pages/ReportPage';
@@ -9,8 +8,6 @@ import ReportSkeleton from './components/ReportSkeleton';
 import MethodologyPage from './pages/MethodologyPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import { getScore, getReportBySlug } from './services/api';
-
-const LIBRARIES = ['places'];
 
 function App() {
   const [appState, setAppState] = useState('search'); // 'search'|'loading'|'skeleton'|'results'|'error'|'notfound'|'methodology'|'leaderboard'
@@ -95,27 +92,23 @@ function App() {
   };
 
   return (
-    <LoadScript
-      googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
-      libraries={LIBRARIES}
-    >
-      <AnimatePresence mode="wait">
-        {appState === 'search' && (
-          <LandingPage
-            key="landing"
-            onSearch={handleSearch}
-            error={error}
-            selectedProfile={selectedProfile}
-            onProfileChange={setSelectedProfile}
-            onGoMethodology={handleGoMethodology}
-            onGoLeaderboard={handleGoLeaderboard}
-          />
-        )}
-        {appState === 'loading' && (
-          <LoadingScreen key="loading" localityName={location.name} />
-        )}
-        {appState === 'error' && (
-          <div key="error" style={{
+    <AnimatePresence mode="wait">
+      {appState === 'search' && (
+        <LandingPage
+          key="landing"
+          onSearch={handleSearch}
+          error={error}
+          selectedProfile={selectedProfile}
+          onProfileChange={setSelectedProfile}
+          onGoMethodology={handleGoMethodology}
+          onGoLeaderboard={handleGoLeaderboard}
+        />
+      )}
+      {appState === 'loading' && (
+        <LoadingScreen key="loading" localityName={location.name} />
+      )}
+      {appState === 'error' && (
+        <div key="error" style={{
             minHeight: '100vh',
             display: 'flex',
             flexDirection: 'column',
@@ -166,35 +159,34 @@ function App() {
               </button>
             </div>
           </div>
-        )}
-        {appState === 'results' && result && (
-          <ReportPage
-            key="results"
-            result={result}
-            lat={location.lat}
-            lng={location.lng}
-            onNewSearch={handleNewSearch}
-            profile={selectedProfile}
-            onSearch={handleSearch}
-            onGoMethodology={handleGoMethodology}
-            onGoLeaderboard={handleGoLeaderboard}
-          />
-        )}
-        {appState === 'leaderboard' && (
-          <LeaderboardPage
-            key="leaderboard"
-            onSearch={handleSearch}
-            onGoHome={handleGoHome}
-          />
-        )}
-        {appState === 'notfound' && (
-          <NotFoundPage key="notfound" onGoHome={handleNewSearch} />
-        )}
-        {appState === 'methodology' && (
-          <MethodologyPage key="methodology" onGoHome={handleGoHome} />
-        )}
-      </AnimatePresence>
-    </LoadScript>
+      )}
+      {appState === 'results' && result && (
+        <ReportPage
+          key="results"
+          result={result}
+          lat={location.lat}
+          lng={location.lng}
+          onNewSearch={handleNewSearch}
+          profile={selectedProfile}
+          onSearch={handleSearch}
+          onGoMethodology={handleGoMethodology}
+          onGoLeaderboard={handleGoLeaderboard}
+        />
+      )}
+      {appState === 'leaderboard' && (
+        <LeaderboardPage
+          key="leaderboard"
+          onSearch={handleSearch}
+          onGoHome={handleGoHome}
+        />
+      )}
+      {appState === 'notfound' && (
+        <NotFoundPage key="notfound" onGoHome={handleNewSearch} />
+      )}
+      {appState === 'methodology' && (
+        <MethodologyPage key="methodology" onGoHome={handleGoHome} />
+      )}
+    </AnimatePresence>
   );
 }
 

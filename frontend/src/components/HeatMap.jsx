@@ -1,6 +1,9 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { GoogleMap, Polygon, OverlayView } from '@react-google-maps/api';
+import { GoogleMap, Polygon, OverlayView, LoadScript } from '@react-google-maps/api';
 import puneLocalities from '../data/pune_localities.json';
+import ErrorBoundary from './ErrorBoundary';
+
+const HEATMAP_LIBRARIES = ['places'];
 
 function safeGtag(...args) {
   if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
@@ -352,9 +355,20 @@ function HeatMap({ onLocalityClick }) {
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      {!mapLoaded && <MapSkeleton />}
+      <ErrorBoundary fallback={
+        <div style={{
+          width: '100%', height: '100%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: '#94A3B8', background: 'rgba(240,244,255,0.8)',
+          borderRadius: 'inherit',
+        }}>
+          Map unavailable — enable Google Maps to see this feature
+        </div>
+      }>
+        <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} libraries={HEATMAP_LIBRARIES}>
+          {!mapLoaded && <MapSkeleton />}
 
-      <GoogleMap
+          <GoogleMap
         mapContainerStyle={MAP_CONTAINER_STYLE}
         center={PUNE_CENTER}
         zoom={12}
@@ -412,7 +426,9 @@ function HeatMap({ onLocalityClick }) {
         {mapLoaded && hoveredFeature && !isMobile && (
           <HoverTooltip feature={hoveredFeature} />
         )}
-      </GoogleMap>
+          </GoogleMap>
+        </LoadScript>
+      </ErrorBoundary>
 
       {/* ── Legend (HTML overlay, not inside map canvas) ── */}
       <Legend />

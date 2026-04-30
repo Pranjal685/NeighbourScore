@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { LoadScript } from '@react-google-maps/api';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { GitCompare, Info, Cpu, MapPin, LayoutGrid, Map } from 'lucide-react';
 import Navbar from '../components/Navbar';
@@ -11,6 +12,9 @@ import CompareMode from '../components/CompareMode';
 import RedFlagAlert from '../components/RedFlagAlert';
 import NearbyAlternatives from '../components/NearbyAlternatives';
 import ShareModal from '../components/ShareModal';
+import ErrorBoundary from '../components/ErrorBoundary';
+
+const REPORT_LIBRARIES = ['places'];
 
 const inView = {
   initial: { opacity: 0, y: 30 },
@@ -318,7 +322,19 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch, onGoMeth
               <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Map size={14} color="#94A3B8" strokeWidth={1.5} /> Location Map</span>
             </SectionLabel>
             <div className="map-bleed map-container">
-              <MapView lat={lat} lng={lng} />
+              <ErrorBoundary fallback={
+                <div style={{
+                  width: '100%', height: '100%', minHeight: 320,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#94A3B8',
+                }}>
+                  Map unavailable — enable Google Maps to see this feature
+                </div>
+              }>
+                <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} libraries={REPORT_LIBRARIES}>
+                  <MapView lat={lat} lng={lng} />
+                </LoadScript>
+              </ErrorBoundary>
               <div style={{
                 position: 'absolute',
                 top: 14,
@@ -372,7 +388,21 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch, onGoMeth
             transition={{ duration: 0.4 }}
             style={{ marginBottom: 48 }}
           >
-            <CompareMode firstResult={result} profile={activeProfile} />
+            <ErrorBoundary fallback={
+              <div className="glass-card" style={{
+                padding: '32px 24px',
+                borderRadius: 16,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#94A3B8',
+                fontSize: 14,
+              }}>
+                Compare feature unavailable — enable Google Maps to use this
+              </div>
+            }>
+              <CompareMode firstResult={result} profile={activeProfile} />
+            </ErrorBoundary>
           </motion.div>
         )}
 

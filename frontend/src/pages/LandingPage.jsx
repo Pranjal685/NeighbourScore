@@ -10,6 +10,47 @@ import {
 import SearchBar from '../components/SearchBar';
 import ProfileSelector from '../components/ProfileSelector';
 import HeatMap from '../components/HeatMap';
+import ErrorBoundary from '../components/ErrorBoundary';
+
+const searchBarFallback = (
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid rgba(255,255,255,0.9)',
+    borderRadius: 16,
+    padding: '5px 5px 5px 16px',
+    width: '100%',
+    boxShadow: '0 8px 32px rgba(99,102,241,0.1), 0 2px 8px rgba(0,0,0,0.06)',
+  }}>
+    <input
+      type="text"
+      placeholder="Search locality e.g. Wakad, Baner, Kothrud..."
+      style={{
+        background: 'transparent',
+        border: 'none',
+        outline: 'none',
+        color: '#1A1A2E',
+        fontSize: 16,
+        flex: 1,
+        padding: '9px 12px',
+        fontFamily: 'var(--font-body)',
+      }}
+    />
+    <div style={{
+      background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+      color: 'white',
+      borderRadius: 12,
+      padding: '10px 24px',
+      fontSize: 14,
+      fontWeight: 700,
+      whiteSpace: 'nowrap',
+      flexShrink: 0,
+    }}>
+      Analyze
+    </div>
+  </div>
+);
 
 const SAMPLE_AREAS = [
   { name: 'Wakad', lat: 18.5987, lng: 73.7686, address: 'Wakad, Pimpri-Chinchwad, Maharashtra, India' },
@@ -383,7 +424,9 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMe
 
                 {/* Search bar */}
                 <motion.div variants={fadeUp} style={{ marginBottom: 0 }}>
-                  <SearchBar onSearch={handleSearch} isLoading={isLoading} />
+                  <ErrorBoundary fallback={searchBarFallback}>
+                    <SearchBar onSearch={handleSearch} isLoading={isLoading} />
+                  </ErrorBoundary>
                 </motion.div>
 
                 {/* Profile selector */}
@@ -816,7 +859,9 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMe
               </p>
 
               <div style={{ maxWidth: 620, width: '100%', margin: '0 auto 22px' }}>
-                <SearchBar onSearch={handleSearch} isLoading={isLoading} />
+                <ErrorBoundary fallback={searchBarFallback}>
+                  <SearchBar onSearch={handleSearch} isLoading={isLoading} />
+                </ErrorBoundary>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap', padding: '0 16px' }}>

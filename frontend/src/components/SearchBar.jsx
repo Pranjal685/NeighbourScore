@@ -46,6 +46,85 @@ function SearchBar({ onSearch, isLoading }) {
     if (e.key === 'Enter') triggerSearch();
   };
 
+  const inputInner = (
+    <motion.div style={{
+      display: 'flex',
+      alignItems: 'center',
+      background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+      border: '1px solid rgba(255,255,255,0.9)',
+      borderRadius: 16,
+      padding: '5px 5px 5px 16px',
+      width: '100%',
+    }}
+    animate={isFocused ? {
+      borderColor: 'rgba(99,102,241,0.5)',
+      boxShadow: [
+        '0 8px 32px rgba(99,102,241,0.1), 0 0 0 0px rgba(99,102,241,0)',
+        '0 8px 32px rgba(99,102,241,0.1), 0 0 0 6px rgba(99,102,241,0.2)',
+        '0 8px 32px rgba(99,102,241,0.1), 0 0 0 10px rgba(99,102,241,0.08)',
+        '0 8px 32px rgba(99,102,241,0.1), 0 0 0 14px rgba(99,102,241,0.03)',
+        '0 8px 32px rgba(99,102,241,0.1), 0 0 0 14px rgba(99,102,241,0)',
+      ]
+    } : {
+      borderColor: 'rgba(255,255,255,0.9)',
+      boxShadow: '0 8px 32px rgba(99,102,241,0.1), 0 2px 8px rgba(0,0,0,0.06)'
+    }}
+    transition={{ duration: 0.6, ease: 'easeOut' }}
+    >
+      <Search size={16} color={isFocused ? '#6366F1' : '#94A3B8'} style={{ flexShrink: 0, transition: 'color 0.2s' }} />
+      <input
+        type="text"
+        placeholder="Search locality e.g. Wakad, Baner, Kothrud..."
+        value={inputValue}
+        onChange={e => setInputValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        style={{
+          background: 'transparent',
+          border: 'none',
+          outline: 'none',
+          color: '#1A1A2E',
+          fontSize: 16, /* 16px minimum prevents iOS auto-zoom on focus */
+          flex: 1,
+          padding: '9px 12px',
+          fontFamily: 'var(--font-body)'
+        }}
+      />
+      <button
+        onClick={triggerSearch}
+        disabled={isLoading}
+        style={{
+          background: isLoading ? 'linear-gradient(135deg, rgba(99,102,241,0.7), rgba(139,92,246,0.7))' : 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+          color: 'white',
+          border: 'none',
+          borderRadius: 12,
+          padding: '10px 24px',
+          fontSize: 14,
+          fontWeight: 700,
+          cursor: isLoading ? 'not-allowed' : 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          boxShadow: '0 4px 20px rgba(99,102,241,0.4)',
+          fontFamily: 'var(--font-body)',
+          transition: 'all 0.2s',
+          whiteSpace: 'nowrap',
+          flexShrink: 0
+        }}
+        onMouseEnter={e => { if (!isLoading) e.currentTarget.style.opacity = 0.9; }}
+        onMouseLeave={e => { if (!isLoading) e.currentTarget.style.opacity = 1; }}
+      >
+        {isLoading && <Loader2 size={14} style={{ animation: 'spin 0.8s linear infinite' }} />}
+        {isLoading ? 'Analyzing...' : 'Analyze'}
+      </button>
+    </motion.div>
+  );
+
+  if (!window.google || !window.google.maps) {
+    return inputInner;
+  }
+
   return (
     <Autocomplete
       onLoad={onLoad}
@@ -56,78 +135,7 @@ function SearchBar({ onSearch, isLoading }) {
         types: ['geocode', 'establishment']
       }}
     >
-      <motion.div style={{
-        display: 'flex',
-        alignItems: 'center',
-        background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.9)',
-        borderRadius: 16,
-        padding: '5px 5px 5px 16px',
-        width: '100%',
-      }}
-      animate={isFocused ? {
-        borderColor: 'rgba(99,102,241,0.5)',
-        boxShadow: [
-          '0 8px 32px rgba(99,102,241,0.1), 0 0 0 0px rgba(99,102,241,0)',
-          '0 8px 32px rgba(99,102,241,0.1), 0 0 0 6px rgba(99,102,241,0.2)',
-          '0 8px 32px rgba(99,102,241,0.1), 0 0 0 10px rgba(99,102,241,0.08)',
-          '0 8px 32px rgba(99,102,241,0.1), 0 0 0 14px rgba(99,102,241,0.03)',
-          '0 8px 32px rgba(99,102,241,0.1), 0 0 0 14px rgba(99,102,241,0)',
-        ]
-      } : {
-        borderColor: 'rgba(255,255,255,0.9)',
-        boxShadow: '0 8px 32px rgba(99,102,241,0.1), 0 2px 8px rgba(0,0,0,0.06)'
-      }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      >
-        <Search size={16} color={isFocused ? '#6366F1' : '#94A3B8'} style={{ flexShrink: 0, transition: 'color 0.2s' }} />
-        <input
-          type="text"
-          placeholder="Search locality e.g. Wakad, Baner, Kothrud..."
-          value={inputValue}
-          onChange={e => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            outline: 'none',
-            color: '#1A1A2E',
-            fontSize: 16, /* 16px minimum prevents iOS auto-zoom on focus */
-            flex: 1,
-            padding: '9px 12px',
-            fontFamily: 'var(--font-body)'
-          }}
-        />
-        <button
-          onClick={triggerSearch}
-          disabled={isLoading}
-          style={{
-            background: isLoading ? 'linear-gradient(135deg, rgba(99,102,241,0.7), rgba(139,92,246,0.7))' : 'linear-gradient(135deg, #6366F1, #8B5CF6)',
-            color: 'white',
-            border: 'none',
-            borderRadius: 12,
-            padding: '10px 24px',
-            fontSize: 14,
-            fontWeight: 700,
-            cursor: isLoading ? 'not-allowed' : 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            boxShadow: '0 4px 20px rgba(99,102,241,0.4)',
-            fontFamily: 'var(--font-body)',
-            transition: 'all 0.2s',
-            whiteSpace: 'nowrap',
-            flexShrink: 0
-          }}
-          onMouseEnter={e => { if (!isLoading) e.currentTarget.style.opacity = 0.9; }}
-          onMouseLeave={e => { if (!isLoading) e.currentTarget.style.opacity = 1; }}
-        >
-          {isLoading && <Loader2 size={14} style={{ animation: 'spin 0.8s linear infinite' }} />}
-          {isLoading ? 'Analyzing...' : 'Analyze'}
-        </button>
-      </motion.div>
+      {inputInner}
     </Autocomplete>
   );
 }
