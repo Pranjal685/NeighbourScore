@@ -3,10 +3,25 @@ import { Autocomplete } from '@react-google-maps/api';
 import { Search, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-function SearchBar({ onSearch, isLoading }) {
+const CITY_CONFIG = {
+  pune: {
+    bounds: { north: 18.65, south: 18.40, east: 74.00, west: 73.70 },
+    placeholder: 'Search locality e.g. Wakad, Baner, Kothrud...',
+    fallbackSuffix: 'Pune, India',
+  },
+  mumbai: {
+    bounds: { north: 19.35, south: 18.85, east: 73.10, west: 72.75 },
+    placeholder: 'Search locality e.g. Bandra, Andheri, Powai...',
+    fallbackSuffix: 'Mumbai, India',
+  },
+};
+
+function SearchBar({ onSearch, isLoading, selectedCity = 'pune' }) {
   const autocompleteRef = useRef(null);
   const [inputValue, setInputValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+
+  const config = CITY_CONFIG[selectedCity] || CITY_CONFIG.pune;
 
   const onLoad = useCallback((autocomplete) => {
     autocompleteRef.current = autocomplete;
@@ -23,7 +38,8 @@ function SearchBar({ onSearch, isLoading }) {
     } else if (inputValue.trim()) {
       if (!window.google) return;
       const geocoder = new window.google.maps.Geocoder();
-      const query = inputValue.toLowerCase().includes('pune') ? inputValue : `${inputValue}, Pune, India`;
+      const cityName = selectedCity === 'mumbai' ? 'Mumbai' : 'Pune';
+      const query = inputValue.toLowerCase().includes(cityName.toLowerCase()) ? inputValue : `${inputValue}, ${config.fallbackSuffix}`;
       geocoder.geocode({ address: query }, (results, status) => {
         if (status === 'OK' && results[0]) {
           const lat = results[0].geometry.location.lat();
@@ -36,7 +52,7 @@ function SearchBar({ onSearch, isLoading }) {
         }
       });
     }
-  }, [onSearch, inputValue]);
+  }, [onSearch, inputValue, selectedCity, config.fallbackSuffix]);
 
   const onPlaceChanged = useCallback(() => {
     triggerSearch();
@@ -74,7 +90,7 @@ function SearchBar({ onSearch, isLoading }) {
       <Search size={16} color={isFocused ? '#6366F1' : '#94A3B8'} style={{ flexShrink: 0, transition: 'color 0.2s' }} />
       <input
         type="text"
-        placeholder="Search locality e.g. Wakad, Baner, Kothrud..."
+        placeholder={config.placeholder}
         value={inputValue}
         onChange={e => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -121,6 +137,7 @@ function SearchBar({ onSearch, isLoading }) {
     </motion.div>
   );
 
+  // Defensive guard: if Google Maps not loaded, return plain input
   if (!window.google || !window.google.maps) {
     return inputInner;
   }
@@ -131,7 +148,7 @@ function SearchBar({ onSearch, isLoading }) {
       onPlaceChanged={onPlaceChanged}
       options={{
         componentRestrictions: { country: 'in' },
-        bounds: { north: 18.65, south: 18.40, east: 74.00, west: 73.70 },
+        bounds: config.bounds,
         types: ['geocode', 'establishment']
       }}
     >

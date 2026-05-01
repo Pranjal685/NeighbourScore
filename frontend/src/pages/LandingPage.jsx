@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import SearchBar from '../components/SearchBar';
 import ProfileSelector from '../components/ProfileSelector';
+import CitySelector from '../components/CitySelector';
 import HeatMap from '../components/HeatMap';
 import ErrorBoundary from '../components/ErrorBoundary';
 
@@ -52,7 +53,7 @@ const searchBarFallback = (
   </div>
 );
 
-const SAMPLE_AREAS = [
+const PUNE_SAMPLE_AREAS = [
   { name: 'Wakad', lat: 18.5987, lng: 73.7686, address: 'Wakad, Pimpri-Chinchwad, Maharashtra, India' },
   { name: 'Baner', lat: 18.5590, lng: 73.7868, address: 'Baner, Pune, Maharashtra, India' },
   { name: 'Kothrud', lat: 18.5074, lng: 73.8077, address: 'Kothrud, Pune, Maharashtra, India' },
@@ -60,12 +61,26 @@ const SAMPLE_AREAS = [
   { name: 'Koregaon Park', lat: 18.5362, lng: 73.8930, address: 'Koregaon Park, Pune, Maharashtra, India' }
 ];
 
-// ... (keep static preview data)
-const PREVIEW_DIMS = [
+const MUMBAI_SAMPLE_AREAS = [
+  { name: 'Bandra West', lat: 19.0596, lng: 72.8295, address: 'Bandra West, Mumbai, Maharashtra, India' },
+  { name: 'Powai', lat: 19.1176, lng: 72.9060, address: 'Powai, Mumbai, Maharashtra, India' },
+  { name: 'Juhu', lat: 19.1075, lng: 72.8263, address: 'Juhu, Mumbai, Maharashtra, India' },
+  { name: 'Andheri West', lat: 19.1197, lng: 72.8464, address: 'Andheri West, Mumbai, Maharashtra, India' },
+  { name: 'Colaba', lat: 18.9067, lng: 72.9152, address: 'Colaba, Mumbai, Maharashtra, India' }
+];
+
+const PUNE_PREVIEW_DIMS = [
   { label: 'School Quality', emoji: '🏫', score: 80 },
   { label: 'Air Quality', emoji: '🌬️', score: 100 },
   { label: 'Healthcare', emoji: '🏥', score: 72 },
   { label: 'Crime Safety', emoji: '🛡️', score: 65 },
+];
+
+const MUMBAI_PREVIEW_DIMS = [
+  { label: 'School Quality', emoji: '🏫', score: 72 },
+  { label: 'Air Quality', emoji: '🌬️', score: 60 },
+  { label: 'Healthcare', emoji: '🏥', score: 78 },
+  { label: 'Crime Safety', emoji: '🛡️', score: 70 },
 ];
 
 function getBarColor(score) {
@@ -191,6 +206,15 @@ function AnimatedStat({ num, label, Icon, index }) {
 
 function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMethodology, onGoLeaderboard }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedCity, setSelectedCity] = useState('pune');
+
+  const isMumbai = selectedCity === 'mumbai';
+  const SAMPLE_AREAS = isMumbai ? MUMBAI_SAMPLE_AREAS : PUNE_SAMPLE_AREAS;
+  const PREVIEW_DIMS = isMumbai ? MUMBAI_PREVIEW_DIMS : PUNE_PREVIEW_DIMS;
+  const previewName = isMumbai ? 'Bandra West, Mumbai' : 'Baner, Pune';
+  const previewScore = isMumbai ? 75 : 81;
+  const previewLabel = previewScore >= 75 ? 'Excellent Neighborhood' : 'Good Neighborhood';
+  const previewColor = getBarColor(previewScore);
 
   const handleSearch = (lat, lng, name) => {
     setIsLoading(true);
@@ -419,13 +443,18 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMe
                 >
                   Indian homebuyers spend months researching localities with no structured data.
                   NeighbourScore gives you an objective, AI-powered report card for any locality
-                  in Pune — built from CPCB, CBSE, NDMA, and NCRB government data.
+                  in Pune & Mumbai — built from CPCB, CBSE, NDMA, and NCRB government data.
                 </motion.p>
+
+                {/* City selector */}
+                <motion.div variants={fadeUp} style={{ marginBottom: 16 }}>
+                  <CitySelector selectedCity={selectedCity} onCityChange={setSelectedCity} />
+                </motion.div>
 
                 {/* Search bar */}
                 <motion.div variants={fadeUp} style={{ marginBottom: 0 }}>
                   <ErrorBoundary fallback={searchBarFallback}>
-                    <SearchBar onSearch={handleSearch} isLoading={isLoading} />
+                    <SearchBar onSearch={handleSearch} isLoading={isLoading} selectedCity={selectedCity} />
                   </ErrorBoundary>
                 </motion.div>
 
@@ -495,12 +524,12 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMe
                       Sample report
                     </span>
                     <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'var(--text-muted)', display: 'inline-block' }} />
-                    <span style={{ fontSize: 12, color: '#94A3B8', fontWeight: 500 }}>Baner, Pune</span>
+                    <span style={{ fontSize: 12, color: '#94A3B8', fontWeight: 500 }}>{previewName}</span>
                   </div>
 
                   {/* Score row */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 22, marginBottom: 26 }}>
-                    <StaticGauge score={81} />
+                    <StaticGauge score={previewScore} />
                     <div>
                       <div style={{
                         fontSize: 10,
@@ -515,24 +544,24 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMe
                         fontSize: 48,
                         fontWeight: 800,
                         fontFamily: 'var(--font-heading)',
-                        color: '#3FB950',
+                        color: previewColor,
                         lineHeight: 1
                       }}>
-                        81
+                        {previewScore}
                         <span style={{ fontSize: 18, fontWeight: 400, color: '#64748B' }}>/100</span>
                       </div>
                       <div style={{
                         display: 'inline-block',
                         marginTop: 6,
                         background: 'var(--secondary-soft)',
-                        color: '#3FB950',
-                        border: '1px solid rgba(63,185,80,0.25)',
+                        color: previewColor,
+                        border: `1px solid ${previewColor}40`,
                         padding: '2px 12px',
                         borderRadius: 100,
                         fontSize: 11,
                         fontWeight: 600
                       }}>
-                        Excellent Neighborhood
+                        {previewLabel}
                       </div>
                     </div>
                   </div>
@@ -603,8 +632,8 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMe
             transition={{ duration: 0.6, ease: 'easeOut' }}
           >
             <div style={{ textAlign: 'center', marginBottom: 40 }}>
-              <p style={sectionLabelStyle}>Explore Pune</p>
-              <h2 style={sectionHeadingStyle}>Pune at a glance</h2>
+              <p style={sectionLabelStyle}>Explore {isMumbai ? 'Mumbai' : 'Pune'}</p>
+              <h2 style={sectionHeadingStyle}>{isMumbai ? 'Mumbai' : 'Pune'} at a glance</h2>
               <p style={{
                 fontSize: 16,
                 color: '#94A3B8',
@@ -615,10 +644,13 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMe
               }}>
                 Every neighborhood scored. Click any area to analyze.
               </p>
+              <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center' }}>
+                <CitySelector selectedCity={selectedCity} onCityChange={setSelectedCity} />
+              </div>
             </div>
 
             <div className="heatmap-wrap">
-              <HeatMap onLocalityClick={handleHeatMapClick} />
+              <HeatMap onLocalityClick={handleHeatMapClick} selectedCity={selectedCity} />
             </div>
           </motion.div>
         </div>
@@ -860,12 +892,12 @@ function LandingPage({ onSearch, error, selectedProfile, onProfileChange, onGoMe
 
               <div style={{ maxWidth: 620, width: '100%', margin: '0 auto 22px' }}>
                 <ErrorBoundary fallback={searchBarFallback}>
-                  <SearchBar onSearch={handleSearch} isLoading={isLoading} />
+                  <SearchBar onSearch={handleSearch} isLoading={isLoading} selectedCity={selectedCity} />
                 </ErrorBoundary>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap', padding: '0 16px' }}>
-                {['Free', 'No signup required', 'Pune only for now'].map(t => (
+                {['Free', 'No signup required', 'Pune & Mumbai'].map(t => (
                   <span key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#94A3B8' }}>
                     <CheckCircle size={13} color="var(--text-muted)" /> {t}
                   </span>

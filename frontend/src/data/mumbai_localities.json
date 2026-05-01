@@ -1,0 +1,22 @@
+[
+  { "name": "Malabar Hill",   "score": 82, "tier": "Premium",    "lat": 18.9548, "lng": 72.7988 },
+  { "name": "Colaba",         "score": 79, "tier": "Premium",    "lat": 18.9067, "lng": 72.9152 },
+  { "name": "Worli",          "score": 76, "tier": "Premium",    "lat": 19.0178, "lng": 72.8173 },
+  { "name": "Bandra West",    "score": 75, "tier": "Premium",    "lat": 19.0596, "lng": 72.8295 },
+  { "name": "Juhu",           "score": 73, "tier": "Good",       "lat": 19.1075, "lng": 72.8263 },
+  { "name": "Dadar",          "score": 72, "tier": "Good",       "lat": 19.0178, "lng": 72.8439 },
+  { "name": "Andheri West",   "score": 69, "tier": "Good",       "lat": 19.1197, "lng": 72.8464 },
+  { "name": "Powai",          "score": 68, "tier": "Good",       "lat": 19.1176, "lng": 72.9060 },
+  { "name": "Mulund",         "score": 66, "tier": "Good",       "lat": 19.1726, "lng": 73.0248 },
+  { "name": "Borivali",       "score": 65, "tier": "Good",       "lat": 19.2307, "lng": 72.8567 },
+  { "name": "Malad",          "score": 64, "tier": "Good",       "lat": 19.1864, "lng": 72.8490 },
+  { "name": "Ghatkopar",      "score": 63, "tier": "Good",       "lat": 19.0860, "lng": 72.9081 },
+  { "name": "Chembur",        "score": 62, "tier": "Good",       "lat": 19.0522, "lng": 72.8994 },
+  { "name": "Kandivali",      "score": 61, "tier": "Good",       "lat": 19.2043, "lng": 72.8493 },
+  { "name": "Goregaon",       "score": 60, "tier": "Good",       "lat": 19.1663, "lng": 72.8494 },
+  { "name": "Kurla",          "score": 58, "tier": "Developing", "lat": 19.0728, "lng": 72.8826 },
+  { "name": "Vikhroli",       "score": 55, "tier": "Developing", "lat": 19.1075, "lng": 72.9263 },
+  { "name": "Dharavi",        "score": 48, "tier": "Developing", "lat": 19.0422, "lng": 72.8553 },
+  { "name": "Govandi",        "score": 42, "tier": "Developing", "lat": 19.0522, "lng": 72.9263 },
+  { "name": "Mankhurd",       "score": 40, "tier": "Developing", "lat": 19.0422, "lng": 72.9363 }
+]

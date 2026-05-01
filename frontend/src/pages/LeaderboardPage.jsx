@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Trophy } from 'lucide-react';
 import ProfileSelector from '../components/ProfileSelector';
+import CitySelector from '../components/CitySelector';
 
-const LOCALITIES = [
+const PUNE_LOCALITIES = [
   { rank: 1,  name: 'Koregaon Park', score: 80, tier: 'Premium',    lat: 18.5362, lng: 73.8937 },
   { rank: 2,  name: 'Kalyani Nagar', score: 77, tier: 'Premium',    lat: 18.5467, lng: 73.9008 },
   { rank: 3,  name: 'Baner',         score: 76, tier: 'Premium',    lat: 18.5590, lng: 73.7868 },
@@ -19,6 +20,29 @@ const LOCALITIES = [
   { rank: 13, name: 'Wakad',         score: 58, tier: 'Developing', lat: 18.5974, lng: 73.7898 },
   { rank: 14, name: 'Wagholi',       score: 55, tier: 'Developing', lat: 18.5788, lng: 73.9796 },
   { rank: 15, name: 'Dhanori',       score: 50, tier: 'Developing', lat: 18.5997, lng: 73.9101 },
+];
+
+const MUMBAI_LOCALITIES = [
+  { rank: 1,  name: 'Malabar Hill',  score: 82, tier: 'Premium',    lat: 18.9548, lng: 72.7988 },
+  { rank: 2,  name: 'Colaba',        score: 79, tier: 'Premium',    lat: 18.9067, lng: 72.9152 },
+  { rank: 3,  name: 'Worli',         score: 76, tier: 'Premium',    lat: 19.0178, lng: 72.8173 },
+  { rank: 4,  name: 'Bandra West',   score: 75, tier: 'Premium',    lat: 19.0596, lng: 72.8295 },
+  { rank: 5,  name: 'Juhu',          score: 73, tier: 'Good',       lat: 19.1075, lng: 72.8263 },
+  { rank: 6,  name: 'Dadar',         score: 72, tier: 'Good',       lat: 19.0178, lng: 72.8439 },
+  { rank: 7,  name: 'Andheri West',  score: 69, tier: 'Good',       lat: 19.1197, lng: 72.8464 },
+  { rank: 8,  name: 'Powai',         score: 68, tier: 'Good',       lat: 19.1176, lng: 72.9060 },
+  { rank: 9,  name: 'Mulund',        score: 66, tier: 'Good',       lat: 19.1726, lng: 73.0248 },
+  { rank: 10, name: 'Borivali',      score: 65, tier: 'Good',       lat: 19.2307, lng: 72.8567 },
+  { rank: 11, name: 'Malad',         score: 64, tier: 'Good',       lat: 19.1864, lng: 72.8490 },
+  { rank: 12, name: 'Ghatkopar',     score: 63, tier: 'Good',       lat: 19.0860, lng: 72.9081 },
+  { rank: 13, name: 'Chembur',       score: 62, tier: 'Good',       lat: 19.0522, lng: 72.8994 },
+  { rank: 14, name: 'Kandivali',     score: 61, tier: 'Good',       lat: 19.2043, lng: 72.8493 },
+  { rank: 15, name: 'Goregaon',      score: 60, tier: 'Good',       lat: 19.1663, lng: 72.8494 },
+  { rank: 16, name: 'Kurla',         score: 58, tier: 'Developing', lat: 19.0728, lng: 72.8826 },
+  { rank: 17, name: 'Vikhroli',      score: 55, tier: 'Developing', lat: 19.1075, lng: 72.9263 },
+  { rank: 18, name: 'Dharavi',       score: 48, tier: 'Developing', lat: 19.0422, lng: 72.8553 },
+  { rank: 19, name: 'Govandi',       score: 42, tier: 'Developing', lat: 19.0522, lng: 72.9263 },
+  { rank: 20, name: 'Mankhurd',      score: 40, tier: 'Developing', lat: 19.0422, lng: 72.9363 },
 ];
 
 const TIER_COLORS = {
@@ -37,13 +61,34 @@ const PROFILE_LABELS = {
   investor: 'Investor',
 };
 
+const CITY_STATS = {
+  pune: {
+    count: '15', topScore: '80', topName: 'Koregaon Park', bottomScore: '50', bottomName: 'Dhanori',
+  },
+  mumbai: {
+    count: '20', topScore: '82', topName: 'Malabar Hill', bottomScore: '40', bottomName: 'Mankhurd',
+  },
+};
+
 function LeaderboardPage({ onSearch, onGoHome }) {
   const [selectedProfile, setSelectedProfile] = useState('general');
   const [activeFilter, setActiveFilter] = useState('All');
+  const [selectedCity, setSelectedCity] = useState('pune');
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Reset filter when city changes
+  useEffect(() => {
+    setActiveFilter('All');
+  }, [selectedCity]);
+
+  const isMumbai = selectedCity === 'mumbai';
+  const LOCALITIES = isMumbai ? MUMBAI_LOCALITIES : PUNE_LOCALITIES;
+  const cityName = isMumbai ? 'Mumbai' : 'Pune';
+  const citySuffix = isMumbai ? ', Mumbai, Maharashtra, India' : ', Pune, Maharashtra, India';
+  const stats = CITY_STATS[selectedCity];
 
   const filtered = activeFilter === 'All'
     ? LOCALITIES
@@ -51,7 +96,7 @@ function LeaderboardPage({ onSearch, onGoHome }) {
 
   const handleAnalyze = (loc) => {
     if (onSearch) {
-      onSearch(loc.lat, loc.lng, loc.name + ', Pune, Maharashtra, India', selectedProfile);
+      onSearch(loc.lat, loc.lng, loc.name + citySuffix, selectedProfile);
     }
   };
 
@@ -126,7 +171,7 @@ function LeaderboardPage({ onSearch, onGoHome }) {
             fontSize: 12, color: '#6366F1', fontWeight: 700,
             letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 12,
           }}>
-            Pune Rankings
+            {cityName} Rankings
           </div>
           <h1 style={{
             fontFamily: 'var(--font-heading)',
@@ -134,11 +179,21 @@ function LeaderboardPage({ onSearch, onGoHome }) {
             fontWeight: 700, color: '#1A1A2E',
             letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 12,
           }}>
-            Pune Neighborhood Leaderboard
+            {cityName} Neighborhood Leaderboard
           </h1>
           <p style={{ fontSize: 15, color: '#94A3B8', lineHeight: 1.65 }}>
-            15 localities ranked by NeighbourScore · Validated across 52 tests · Click any row to analyze
+            {stats.count} localities ranked by NeighbourScore · Click any row to analyze
           </p>
+        </motion.div>
+
+        {/* City selector */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.05 }}
+          style={{ marginBottom: 20 }}
+        >
+          <CitySelector selectedCity={selectedCity} onCityChange={setSelectedCity} />
         </motion.div>
 
         {/* Stats bar */}
@@ -150,9 +205,9 @@ function LeaderboardPage({ onSearch, onGoHome }) {
           style={{ display: 'flex', marginBottom: 28, overflow: 'hidden' }}
         >
           {[
-            { label: 'Localities Ranked', value: '15',  icon: '🏙️', sub: null },
-            { label: 'Top Score',         value: '80',  icon: '🥇', sub: 'Koregaon Park' },
-            { label: 'Lowest Score',      value: '50',  icon: '📍', sub: 'Dhanori' },
+            { label: 'Localities Ranked', value: stats.count,       icon: '🏙️', sub: null },
+            { label: 'Top Score',         value: stats.topScore,    icon: '🥇', sub: stats.topName },
+            { label: 'Lowest Score',      value: stats.bottomScore, icon: '📍', sub: stats.bottomName },
           ].map((stat, i) => (
             <div
               key={stat.label}

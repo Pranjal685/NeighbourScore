@@ -1,6 +1,7 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { GoogleMap, Polygon, OverlayView, LoadScript } from '@react-google-maps/api';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { GoogleMap, Polygon, OverlayView, LoadScript, Circle } from '@react-google-maps/api';
 import puneLocalities from '../data/pune_localities.json';
+import mumbaiLocalities from '../data/mumbai_localities.json';
 import ErrorBoundary from './ErrorBoundary';
 
 const HEATMAP_LIBRARIES = ['places'];
@@ -24,6 +25,7 @@ const MAP_STYLES = [
 
 const MAP_CONTAINER_STYLE = { width: '100%', height: '100%' };
 const PUNE_CENTER = { lat: 18.5204, lng: 73.8567 };
+const MUMBAI_CENTER = { lat: 19.0760, lng: 72.8777 };
 
 // ─── Color helpers ────────────────────────────────────────────────────────────
 function getScoreColor(score) {
@@ -104,14 +106,12 @@ function Legend() {
 }
 
 // ─── Desktop hover tooltip (OverlayView) ─────────────────────────────────────
-function HoverTooltip({ feature }) {
-  const { name, score } = feature.properties;
+function HoverTooltip({ name, score, position }) {
   const color = getScoreColor(score);
-  const center = getPolygonCenter(feature.geometry.coordinates);
 
   return (
     <OverlayView
-      position={center}
+      position={position}
       mapPaneName={OverlayView.FLOAT_PANE}
       getPixelPositionOffset={(w, h) => ({ x: -(w / 2), y: -(h + 14) })}
     >
@@ -205,9 +205,47 @@ function PolygonLabel({ feature }) {
   );
 }
 
+// ─── Mumbai marker label (always visible) ─────────────────────────────────────
+function MarkerLabel({ locality, isHovered }) {
+  const color = getScoreColor(locality.score);
+  const position = { lat: locality.lat, lng: locality.lng };
+
+  return (
+    <OverlayView
+      position={position}
+      mapPaneName={OverlayView.OVERLAY_LAYER}
+      getPixelPositionOffset={(w, h) => ({ x: -(w / 2), y: -(h / 2) })}
+    >
+      <div style={{
+        pointerEvents: 'none', textAlign: 'center', userSelect: 'none',
+        transform: isHovered ? 'scale(1.15)' : 'scale(1)',
+        transition: 'transform 0.15s',
+      }}>
+        <div style={{
+          fontSize: 11, fontWeight: 700, color: '#1A1A2E',
+          background: isHovered ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.88)',
+          padding: '1px 6px', borderRadius: 4,
+          whiteSpace: 'nowrap', lineHeight: 1.6,
+          marginBottom: 2,
+          boxShadow: isHovered ? '0 2px 8px rgba(0,0,0,0.12)' : 'none',
+        }}>
+          {locality.name}
+        </div>
+        <div style={{
+          display: 'inline-block',
+          fontSize: 10, fontWeight: 800, color: '#fff',
+          background: color,
+          padding: '1px 7px', borderRadius: 8, lineHeight: 1.5,
+        }}>
+          {locality.score}
+        </div>
+      </div>
+    </OverlayView>
+  );
+}
+
 // ─── Mobile bottom sheet ─────────────────────────────────────────────────────
-function MobileSheet({ feature, onAnalyze, onDismiss }) {
-  const { name, score } = feature.properties;
+function MobileSheet({ name, score, onAnalyze, onDismiss }) {
   const color = getScoreColor(score);
 
   return (
@@ -281,7 +319,7 @@ function MobileSheet({ feature, onAnalyze, onDismiss }) {
 }
 
 // ─── Loading skeleton ─────────────────────────────────────────────────────────
-function MapSkeleton() {
+function MapSkeleton({ cityName }) {
   return (
     <div style={{
       position: 'absolute', inset: 0,
@@ -301,7 +339,7 @@ function MapSkeleton() {
           margin: '0 auto 14px',
         }} />
         <p style={{ fontSize: 14, color: '#64748B', fontWeight: 500 }}>
-          Loading Pune map…
+          Loading {cityName} map…
         </p>
       </div>
     </div>
@@ -309,18 +347,41 @@ function MapSkeleton() {
 }
 
 // ─── Main HeatMap component ───────────────────────────────────────────────────
-function HeatMap({ onLocalityClick }) {
+function HeatMap({ onLocalityClick, selectedCity = 'pune' }) {
   const [hoveredLocality, setHoveredLocality] = useState(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [zoom, setZoom] = useState(12);
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 640);
   const mapRef = useRef(null);
+  const hasMounted = useRef(false);
+
+  const isMumbai = selectedCity === 'mumbai';
+  const mapCenter = useMemo(() => isMumbai ? MUMBAI_CENTER : PUNE_CENTER, [isMumbai]);
+  const defaultZoom = isMumbai ? 11 : 12;
+  const cityName = isMumbai ? 'Mumbai' : 'Pune';
+
+  // Reset hover state when city changes
+  useEffect(() => {
+    setHoveredLocality(null);
+  }, [selectedCity]);
 
   useEffect(() => {
     const handler = () => setIsMobile(window.innerWidth < 640);
     window.addEventListener('resize', handler);
     return () => window.removeEventListener('resize', handler);
   }, []);
+
+  // Pan map to new city center when selectedCity changes (skip initial mount)
+  useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
+    if (mapRef.current) {
+      mapRef.current.panTo(mapCenter);
+      mapRef.current.setZoom(defaultZoom);
+    }
+  }, [selectedCity, mapCenter, defaultZoom]);
 
   const onLoad = useCallback((map) => {
     mapRef.current = map;
@@ -336,11 +397,17 @@ function HeatMap({ onLocalityClick }) {
     if (isMobile) setHoveredLocality(null);
   }, [isMobile]);
 
-  const hoveredFeature = hoveredLocality
+  // ─── Pune: find hovered feature from GeoJSON ───
+  const hoveredPuneFeature = !isMumbai && hoveredLocality
     ? puneLocalities.features.find(f => f.properties.name === hoveredLocality)
     : null;
 
-  const handleAnalyze = useCallback((feature) => {
+  // ─── Mumbai: find hovered locality from JSON array ───
+  const hoveredMumbaiLocality = isMumbai && hoveredLocality
+    ? mumbaiLocalities.find(l => l.name === hoveredLocality)
+    : null;
+
+  const handleAnalyzePune = useCallback((feature) => {
     const center = getPolygonCenter(feature.geometry.coordinates);
     safeGtag('event', 'heatmap_click', {
       locality_name: feature.properties.name,
@@ -350,6 +417,19 @@ function HeatMap({ onLocalityClick }) {
       ...feature.properties,
       lat: center.lat,
       lng: center.lng,
+    });
+  }, [onLocalityClick]);
+
+  const handleAnalyzeMumbai = useCallback((locality) => {
+    safeGtag('event', 'heatmap_click', {
+      locality_name: locality.name,
+      score: locality.score,
+    });
+    onLocalityClick({
+      name: locality.name + ', Mumbai, Maharashtra, India',
+      score: locality.score,
+      lat: locality.lat,
+      lng: locality.lng,
     });
   }, [onLocalityClick]);
 
@@ -366,12 +446,12 @@ function HeatMap({ onLocalityClick }) {
         </div>
       }>
         <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} libraries={HEATMAP_LIBRARIES}>
-          {!mapLoaded && <MapSkeleton />}
+          {!mapLoaded && <MapSkeleton cityName={cityName} />}
 
           <GoogleMap
         mapContainerStyle={MAP_CONTAINER_STYLE}
-        center={PUNE_CENTER}
-        zoom={12}
+        center={mapCenter}
+        zoom={defaultZoom}
         options={{
           styles: MAP_STYLES,
           disableDefaultUI: true,
@@ -382,7 +462,8 @@ function HeatMap({ onLocalityClick }) {
         onZoomChanged={onZoomChanged}
         onClick={onMapClick}
       >
-        {puneLocalities.features.map((feature) => {
+        {/* ═══ PUNE MODE: GeoJSON polygons ═══ */}
+        {!isMumbai && puneLocalities.features.map((feature) => {
           const { name, score } = feature.properties;
           const isHovered = hoveredLocality === name;
           const color = getScoreColor(score);
@@ -409,7 +490,7 @@ function HeatMap({ onLocalityClick }) {
                     setHoveredLocality(name);
                   } else {
                     // Desktop: click goes straight to analysis
-                    handleAnalyze(feature);
+                    handleAnalyzePune(feature);
                   }
                 }}
               />
@@ -422,9 +503,60 @@ function HeatMap({ onLocalityClick }) {
           );
         })}
 
-        {/* ── Hover tooltip (desktop only) ── */}
-        {mapLoaded && hoveredFeature && !isMobile && (
-          <HoverTooltip feature={hoveredFeature} />
+        {/* ═══ MUMBAI MODE: Circle markers ═══ */}
+        {isMumbai && mumbaiLocalities.map((locality) => {
+          const isHovered = hoveredLocality === locality.name;
+          const color = getScoreColor(locality.score);
+          const position = { lat: locality.lat, lng: locality.lng };
+
+          return (
+            <React.Fragment key={locality.name}>
+              <Circle
+                center={position}
+                radius={isHovered ? 700 : 500}
+                options={{
+                  fillColor: color,
+                  fillOpacity: isHovered ? 0.7 : 0.45,
+                  strokeColor: color,
+                  strokeOpacity: 0.9,
+                  strokeWeight: isHovered ? 3 : 1.5,
+                  clickable: true,
+                }}
+                onMouseOver={() => !isMobile && setHoveredLocality(locality.name)}
+                onMouseOut={() => !isMobile && setHoveredLocality(null)}
+                onClick={() => {
+                  if (isMobile) {
+                    setHoveredLocality(locality.name);
+                  } else {
+                    handleAnalyzeMumbai(locality);
+                  }
+                }}
+              />
+
+              {/* ── Marker label (always visible) ── */}
+              {mapLoaded && !isMobile && (
+                <MarkerLabel locality={locality} isHovered={isHovered} />
+              )}
+            </React.Fragment>
+          );
+        })}
+
+        {/* ── Pune hover tooltip (desktop only) ── */}
+        {mapLoaded && hoveredPuneFeature && !isMobile && (
+          <HoverTooltip
+            name={hoveredPuneFeature.properties.name}
+            score={hoveredPuneFeature.properties.score}
+            position={getPolygonCenter(hoveredPuneFeature.geometry.coordinates)}
+          />
+        )}
+
+        {/* ── Mumbai hover tooltip (desktop only) ── */}
+        {mapLoaded && hoveredMumbaiLocality && !isMobile && (
+          <HoverTooltip
+            name={hoveredMumbaiLocality.name}
+            score={hoveredMumbaiLocality.score}
+            position={{ lat: hoveredMumbaiLocality.lat, lng: hoveredMumbaiLocality.lng }}
+          />
         )}
           </GoogleMap>
         </LoadScript>
@@ -433,11 +565,22 @@ function HeatMap({ onLocalityClick }) {
       {/* ── Legend (HTML overlay, not inside map canvas) ── */}
       <Legend />
 
-      {/* ── Mobile bottom sheet ── */}
-      {hoveredFeature && isMobile && (
+      {/* ── Pune mobile bottom sheet ── */}
+      {hoveredPuneFeature && isMobile && (
         <MobileSheet
-          feature={hoveredFeature}
-          onAnalyze={() => handleAnalyze(hoveredFeature)}
+          name={hoveredPuneFeature.properties.name}
+          score={hoveredPuneFeature.properties.score}
+          onAnalyze={() => handleAnalyzePune(hoveredPuneFeature)}
+          onDismiss={() => setHoveredLocality(null)}
+        />
+      )}
+
+      {/* ── Mumbai mobile bottom sheet ── */}
+      {hoveredMumbaiLocality && isMobile && (
+        <MobileSheet
+          name={hoveredMumbaiLocality.name}
+          score={hoveredMumbaiLocality.score}
+          onAnalyze={() => handleAnalyzeMumbai(hoveredMumbaiLocality)}
           onDismiss={() => setHoveredLocality(null)}
         />
       )}
