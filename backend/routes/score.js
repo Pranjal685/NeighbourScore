@@ -132,7 +132,7 @@ async function runScoringPipeline(lat, lng, locality_name, profile = 'general') 
 
   // Generate AI narratives (profile-aware) and nearby alternatives in parallel
   const [narratives, nearby_alternatives] = await Promise.all([
-    generateNarratives(dimensions, locality_name, profile),
+    generateNarratives(dimensions, locality_name, profile, lat, lng),
     getNearbyAlternatives(locality_name, composite),
   ]);
 

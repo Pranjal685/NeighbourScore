@@ -1,5 +1,61 @@
+const axios = require('axios');
 const db = require('../firebase');
 const ngeohash = require('ngeohash');
+
+// Mumbai bounding box — all requests inside this bbox go to Places API
+const MUMBAI_BBOX = { minLat: 18.85, maxLat: 19.35, minLng: 72.75, maxLng: 73.10 };
+
+function isMumbai(lat, lng) {
+  return lat >= MUMBAI_BBOX.minLat && lat <= MUMBAI_BBOX.maxLat &&
+         lng >= MUMBAI_BBOX.minLng && lng <= MUMBAI_BBOX.maxLng;
+}
+
+function schoolCountToScore(count) {
+  if (count === 0) return 20;
+  if (count <= 2) return 40;
+  if (count <= 5) return 60;
+  if (count <= 9) return 75;
+  return 90;
+}
+
+async function getMumbaiSchoolScore(lat, lng) {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (!apiKey) return { score: 50, raw: { count: 0, source: 'google_places', error: 'no_api_key' } };
+
+  try {
+    const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+    const { data } = await axios.get(url, {
+      params: { location: `${lat},${lng}`, radius: 3000, type: 'school', key: apiKey },
+      timeout: 10000,
+    });
+
+    if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+      return { score: 50, raw: { count: 0, source: 'google_places', api_status: data.status } };
+    }
+
+    const results = data.results || [];
+    const count = results.length;
+    const score = schoolCountToScore(count);
+
+    console.log(`[Schools] Mumbai Places API: ${count} schools found → score ${score}`);
+
+    return {
+      score,
+      raw: {
+        count,
+        source: 'google_places',
+        schools: results.slice(0, 5).map((r) => ({
+          name: r.name,
+          vicinity: r.vicinity || '',
+          rating: r.rating || null,
+        })),
+      },
+    };
+  } catch (err) {
+    console.error('[Schools] Mumbai Places API error:', err.message);
+    return { score: 50, raw: { count: 0, source: 'google_places', error: err.message } };
+  }
+}
 
 // Locality-based school score fallbacks (CBSE school density per area)
 // Used when geohash returns sparse results (likely incomplete Firestore data)
@@ -32,6 +88,11 @@ function haversine(lat1, lng1, lat2, lng2) {
  * Query CBSE schools within ~3km using geohash proximity.
  */
 async function getSchoolScore(lat, lng, localityName) {
+  if (isMumbai(lat, lng)) {
+    console.log(`[Schools] Mumbai bbox hit (${lat}, ${lng}) → Places API`);
+    return getMumbaiSchoolScore(lat, lng);
+  }
+
   try {
     const center = ngeohash.encode(lat, lng, 5);
     const neighbors = ngeohash.neighbors(center);
