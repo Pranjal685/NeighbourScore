@@ -85,8 +85,6 @@ async function getAqiScore(lat, lng, localityName) {
       return { score: 60, raw: { error: true, note: 'No CPCB stations returned' } };
     }
 
-    // Log first record to reveal actual field names from CPCB API
-    console.log('[AQI] Raw response sample:', JSON.stringify(records[0]));
     console.log('[AQI] Total records returned:', records.length);
 
     /**
@@ -191,7 +189,8 @@ async function getAqiScore(lat, lng, localityName) {
       },
     };
   } catch (err) {
-    return { score: 60, raw: { error: true, message: err.message } };
+    console.error('[aqi] error:', err.message);
+    return { score: 60, raw: { error: true } };
   }
 }
 

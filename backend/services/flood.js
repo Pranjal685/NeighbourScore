@@ -51,7 +51,8 @@ async function getFloodScore(lat, lng) {
       raw: { in_flood_zone: false, hazard_level: null },
     };
   } catch (err) {
-    return { score: 70, raw: { error: true, message: err.message } };
+    console.error('[flood] error:', err.message);
+    return { score: 70, raw: { error: true } };
   }
 }
 

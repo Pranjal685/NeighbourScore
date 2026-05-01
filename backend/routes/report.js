@@ -10,6 +10,11 @@ const db = require('../firebase');
 router.get('/:slug', async (req, res) => {
   try {
     const slug = req.params.slug;
+
+    if (!/^[a-z0-9-]{1,100}$/.test(slug)) {
+      return res.status(400).json({ error: 'Invalid report ID' });
+    }
+
     const docRef = db.collection('shared_reports').doc(slug);
     const docSnap = await docRef.get();
 
@@ -24,8 +29,8 @@ router.get('/:slug', async (req, res) => {
 
     return res.json(docSnap.data());
   } catch (err) {
-    console.error('Error fetching shared report:', err);
-    res.status(500).json({ error: 'Internal server error', message: err.message });
+    console.error('[report] error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

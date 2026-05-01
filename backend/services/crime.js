@@ -91,7 +91,8 @@ async function getCrimeScore(lat, lng, localityName) {
       },
     };
   } catch (err) {
-    return { score: 60, raw: { error: true, message: err.message, recent_news: [] } };
+    console.error('[crime] error:', err.message);
+    return { score: 60, raw: { error: true, recent_news: [] } };
   }
 }
 

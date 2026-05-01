@@ -21,7 +21,7 @@ app.use(cors({
     'https://neighbourscore-492917.firebaseapp.com'
   ]
 }));
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 
 // Rate limiter — 20 requests per IP per minute on /api/score.
 // Localhost is exempt so that the dev server and test suite are not throttled.
@@ -34,7 +34,7 @@ const scoreLimiter = rateLimit({
     return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1'
   },
   message: { error: 'Too many requests. Please wait a minute.' },
-  standardHeaders: true,
+  standardHeaders: false,
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
 });

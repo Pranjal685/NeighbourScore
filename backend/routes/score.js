@@ -238,8 +238,8 @@ router.post('/', async (req, res) => {
     memoryCache.set(cacheKey, { data: response, timestamp: Date.now() });
     res.json(response);
   } catch (err) {
-    console.error('Score endpoint error:', err);
-    res.status(500).json({ error: 'Internal server error', message: err.message });
+    console.error('[score] error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -268,8 +268,8 @@ router.get('/:locality', async (req, res) => {
       error: 'No cached score found for this locality. Use POST /api/score with lat/lng to generate a new score.',
     });
   } catch (err) {
-    console.error('Cache lookup error:', err);
-    res.status(500).json({ error: 'Internal server error', message: err.message });
+    console.error('[score] cache lookup error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

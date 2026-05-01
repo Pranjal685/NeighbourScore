@@ -52,7 +52,8 @@ async function tryGeminiSearch(localityName) {
       tools: [{ googleSearch: {} }],
     });
 
-    const prompt = `What is the current property price per square foot in ${localityName} in 2026? Give me the average price in INR per sqft and the approximate 12-month price appreciation percentage. Respond ONLY in this JSON format with no other text: {"price_per_sqft": number, "trend_12m_pct": number, "source": "string"}`;
+    const safeLocalityName = localityName.replace(/[{}\n\r]/g, '').slice(0, 100);
+    const prompt = `What is the current property price per square foot in ${safeLocalityName} in 2026? Give me the average price in INR per sqft and the approximate 12-month price appreciation percentage. Respond ONLY in this JSON format with no other text: {"price_per_sqft": number, "trend_12m_pct": number, "source": "string"}`;
 
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],

@@ -1,4 +1,4 @@
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 // Timeout (ms) for score API — Cloud Run cold start can take ~10s, pipeline ~15s
 const SCORE_TIMEOUT_MS = 55000;

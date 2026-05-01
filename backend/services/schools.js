@@ -159,7 +159,8 @@ async function getSchoolScore(lat, lng, localityName) {
       },
     };
   } catch (err) {
-    return { score: 50, raw: { error: true, message: err.message } };
+    console.error('[schools] error:', err.message);
+    return { score: 50, raw: { error: true } };
   }
 }
 
