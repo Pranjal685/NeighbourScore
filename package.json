@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "description": "Test suite for NeighbourScore backend",
   "scripts": {
-    "test": "jest --testTimeout=30000 --forceExit --runInBand",
-    "test:stress": "jest tests/stress.test.js --testTimeout=60000 --forceExit",
-    "test:scoring": "jest tests/scoring.test.js --testTimeout=30000 --forceExit",
-    "test:security": "jest tests/security.test.js --testTimeout=30000 --forceExit"
+    "test": "jest --forceExit --runInBand",
+    "test:stress": "jest tests/stress.test.js tests/hardcore_stress.test.js tests/mumbai_stress.test.js --forceExit --runInBand",
+    "test:security": "jest tests/security.test.js tests/xss.test.js --forceExit --runInBand",
+    "test:scoring": "jest tests/scoring.test.js tests/hardcore_stress.test.js --forceExit --runInBand"
   },
   "jest": {
     "testEnvironment": "node",
+    "testTimeout": 30000,
+    "testPathIgnorePatterns": ["tests/api_leak_check.js"],
     "testMatch": [
       "**/tests/**/*.test.js"
     ]

@@ -195,7 +195,7 @@ const MEMORY_CACHE_TTL = 60 * 60 * 1000; // 1 hour
  */
 router.post('/', async (req, res) => {
   try {
-    const { lat, lng, locality_name, profile } = req.body;
+    const { lat, lng, locality_name, profile } = req.body || {};
 
     // Validate lat and lng exist
     if (lat == null || lng == null) {

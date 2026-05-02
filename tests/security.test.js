@@ -1,7 +1,7 @@
 const axios = require('axios')
 const express = require('express')
 const rateLimit = require('express-rate-limit')
-const BASE_URL = 'http://localhost:5000'
+const BASE_URL = process.env.TEST_URL || 'http://localhost:5000'
 
 // Isolated rate-limit test server — runs on port 5099 so it never
 // pollutes the shared backend's counter during parallel test execution.

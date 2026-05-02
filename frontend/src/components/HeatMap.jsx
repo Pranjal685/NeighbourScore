@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { GoogleMap, Polygon, OverlayView, LoadScript, Circle } from '@react-google-maps/api';
+import { GoogleMap, Polygon, OverlayView, useJsApiLoader, Circle } from '@react-google-maps/api';
 import puneLocalities from '../data/pune_localities.json';
 import mumbaiLocalities from '../data/mumbai_localities.json';
 import ErrorBoundary from './ErrorBoundary';
@@ -348,6 +348,11 @@ function MapSkeleton({ cityName }) {
 
 // ─── Main HeatMap component ───────────────────────────────────────────────────
 function HeatMap({ onLocalityClick, selectedCity = 'pune' }) {
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+    libraries: HEATMAP_LIBRARIES,
+  });
+
   const [hoveredLocality, setHoveredLocality] = useState(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [zoom, setZoom] = useState(12);
@@ -445,8 +450,8 @@ function HeatMap({ onLocalityClick, selectedCity = 'pune' }) {
           Map unavailable — enable Google Maps to see this feature
         </div>
       }>
-        <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} libraries={HEATMAP_LIBRARIES}>
-          {!mapLoaded && <MapSkeleton cityName={cityName} />}
+        {(!isLoaded || !mapLoaded) && <MapSkeleton cityName={cityName} />}
+        {isLoaded && <>
 
           <GoogleMap
         mapContainerStyle={MAP_CONTAINER_STYLE}
@@ -559,7 +564,7 @@ function HeatMap({ onLocalityClick, selectedCity = 'pune' }) {
           />
         )}
           </GoogleMap>
-        </LoadScript>
+        </>}
       </ErrorBoundary>
 
       {/* ── Legend (HTML overlay, not inside map canvas) ── */}

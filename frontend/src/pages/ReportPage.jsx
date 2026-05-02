@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LoadScript } from '@react-google-maps/api';
+import { useJsApiLoader } from '@react-google-maps/api';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { GitCompare, Info, Cpu, MapPin, LayoutGrid, Map } from 'lucide-react';
 import Navbar from '../components/Navbar';
@@ -46,6 +46,11 @@ const PROFILE_META = {
 };
 
 function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch, onGoMethodology, onGoLeaderboard }) {
+  const { isLoaded: mapsLoaded } = useJsApiLoader({
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+    libraries: REPORT_LIBRARIES,
+  });
+
   const [showCompare, setShowCompare] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const activeProfile = result.profile || profile || 'general';
@@ -331,9 +336,10 @@ function ReportPage({ result, lat, lng, onNewSearch, profile, onSearch, onGoMeth
                   Map unavailable — enable Google Maps to see this feature
                 </div>
               }>
-                <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} libraries={REPORT_LIBRARIES}>
-                  <MapView lat={lat} lng={lng} />
-                </LoadScript>
+                {mapsLoaded
+                  ? <MapView lat={lat} lng={lng} />
+                  : <div style={{ width: '100%', minHeight: 320, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8' }}>Loading map…</div>
+                }
               </ErrorBoundary>
               <div style={{
                 position: 'absolute',

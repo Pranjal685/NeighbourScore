@@ -1,7 +1,9 @@
 const axios = require('axios')
 const express = require('express')
 const rateLimit = require('express-rate-limit')
-const BASE_URL = 'http://localhost:5000'
+const BASE_URL = process.env.TEST_URL || 'http://localhost:5000'
+
+jest.setTimeout(60000)
 
 const MUMBAI_LOCALITIES = [
   { lat: 19.0600, lng: 72.8300, locality_name: 'Bandra West, Mumbai' },

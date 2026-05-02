@@ -1,5 +1,7 @@
 const axios = require('axios')
-const BASE_URL = 'http://localhost:5000'
+const BASE_URL = process.env.TEST_URL || 'http://localhost:5000'
+
+jest.setTimeout(60000)
 
 const LOCALITIES = [
   { lat: 18.5974, lng: 73.7898, locality_name: 'Wakad, Pune' },
